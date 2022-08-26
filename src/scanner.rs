@@ -19,7 +19,7 @@ impl Scanner{
         }
     }
 
-    pub fn scan_tokens(&mut self) -> Result<Vec<&Token>, String>{
+    pub fn scan_tokens(&mut self) -> Result<&Vec<Token>, String>{
         while !self.is_at_end(){
             self.start = self.current;
             self.scan_token();
@@ -30,18 +30,30 @@ impl Scanner{
     }
 
     fn is_at_end(&self) -> bool{
-        self.current > self.source.len()
+        self.current >= self.source.len()
     }
 
     fn scan_token(&self){
         let c = self.advance();
-
         match c{
-
+            '(' => self.add_token(TokenType::LeftParen),
+            ')' => self.add_token(TokenType::RightParen),
+            '{' => self.add_token(TokenType::LeftBrace),
+            '}' => self.add_token(TokenType::RightBrace),
+            ',' => self.add_token(TokenType::Comma),
+            '.' => self.add_token(TokenType::Dot),
+            '-' => self.add_token(TokenType::Minus),
+            '+' => self.add_token(TokenType::Plus),
+            ';' => self.add_token(TokenType::Semicolon),
+            '*' => self.add_token(TokenType::Star)
         }
     }
 
     fn advance(&self) -> char{
-        self.source.chars().nth(self.current + 1).unwrap();
+        self.source.chars().nth(self.current + 1).unwrap()
+    }
+
+    fn add_token(&self,token: TokenType) {
+
     }
 }  
