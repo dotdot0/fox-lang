@@ -92,6 +92,10 @@ impl Scanner{
                     self.add_token(TokenType::Slash)
                 }
             },
+            '"' => match self.string(){
+                Ok(_) => (),
+                Err(e) => e.report(&self.source)
+            },
             ' ' => (),
             '\r' => (),
             '\t' => (),
@@ -142,12 +146,22 @@ impl Scanner{
         }
     }
 
-    fn string(&mut self){
+    fn string(&mut self) -> Result<(), LoxError>{
         while self.peek().unwrap() != '"' && !self.is_at_end(){
             if self.peek().unwrap() == '\n'{
                 self.line += 1;
                 self.advance();
             }
+        }
+
+        if self.is_at_end(){
+            Err(LoxError::error(self.line, "Unterminated string.".to_owned()))
+        }
+        else{
+            self.advance();
+            let value: String = self.source[self.start + 1 .. self.current -1].to_string();
+            self.add_token_object(TokenType::STRING, Some(Object::Str(value)));
+            Ok(())
         }
     }
     
