@@ -141,5 +141,14 @@ impl Scanner{
             self.source.chars().nth(self.current)
         }
     }
+
+    fn string(&mut self){
+        while self.peek().unwrap() != '"' && !self.is_at_end(){
+            if self.peek().unwrap() == '\n'{
+                self.line += 1;
+                self.advance();
+            }
+        }
+    }
     
 }  
