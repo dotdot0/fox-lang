@@ -8,7 +8,7 @@ impl LoxError{
     LoxError { line, message }
   }
 
-  pub fn report(&self, loc: String) {
+  pub fn report(&self, loc: &String) {
     eprintln!("[line {}] Error {}: {}", self.line, loc, self.message)
   }
 }

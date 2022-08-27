@@ -24,7 +24,10 @@ impl Scanner{
     pub fn scan_tokens(&mut self) -> Result<&Vec<Token>, String>{
         while !self.is_at_end(){
             self.start = self.current;
-            self.scan_token();  
+            match self.scan_token(){
+                Ok(_) => (),
+                Err(e) => e.report(&self.source)
+            }  
         }
         self.tokens.push(Token::eof(self.line));
 
@@ -89,6 +92,10 @@ impl Scanner{
                     self.add_token(TokenType::Slash)
                 }
             },
+            ' ' => (),
+            '\r' => (),
+            '\t' => (),
+            '\n' => self.line += 1,
             _ => {
                 return Err(LoxError::error(self.line, "Unexpected Character".to_owned()));
             }

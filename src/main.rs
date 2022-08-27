@@ -28,11 +28,13 @@ fn run_file(file: &String){
 }
 
 fn run_prompt(){
-  print!(">");
-  let _ = io::stdout().flush();
-  let mut input = String::new();
-  io::stdin().read_line(&mut input).expect("Unable to read code!");
-  run(input)
+  loop {
+    print!(">");
+    let _ = io::stdout().flush();
+    let mut input = String::new();
+    io::stdin().read_line(&mut input).expect("Unable to read code!");
+    run(input)
+  }
 }
 
 fn run(source: String) {
