@@ -1,5 +1,6 @@
-#![allow(dead_code)]
+#![allow(dead_code, unused_imports)]
 use crate::{token::{*, self}, token_type::TokenType};
+use crate::error::LoxError;
 
 pub struct Scanner{
     pub source:  String,
@@ -23,7 +24,7 @@ impl Scanner{
     pub fn scan_tokens(&mut self) -> Result<&Vec<Token>, String>{
         while !self.is_at_end(){
             self.start = self.current;
-            self.scan_token();
+            self.scan_token();  
         }
         self.tokens.push(Token::eof(self.line));
 
@@ -34,7 +35,7 @@ impl Scanner{
         self.current >= self.source.len()
     }
 
-    fn scan_token(&mut self){
+    fn scan_token(&mut self) -> Result<(), LoxError>{
         let c = self.advance();
         match c{
             '(' => self.add_token(TokenType::LeftParen),
@@ -79,10 +80,22 @@ impl Scanner{
                 };
                 self.add_token(tok);
             },
+            '/' => {
+                if self.is_match('/'){
+                    while self.peek().unwrap() != '\n' && !self.is_at_end() {
+                        self.advance();
+                    }
+                }else{
+                    self.add_token(TokenType::Slash)
+                }
+            },
             _ => {
-                unreachable!("unexpected character")
+                return Err(LoxError::error(self.line, "Unexpected Character".to_owned()));
             }
+
+
     }
+    Ok(())
     }
 
     fn advance(&mut self) -> char{
@@ -113,5 +126,13 @@ impl Scanner{
         }
     }
 
+    fn peek(&mut self) -> Option<char>{
+        if self.is_at_end() { 
+            Some('\0')
+        }
+        else{
+            self.source.chars().nth(self.current)
+        }
+    }
     
 }  

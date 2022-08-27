@@ -1,3 +1,4 @@
+#![allow(non_camel_case_types, dead_code)]
 #[derive(Debug, PartialEq, Copy, Clone, Eq)]
 pub enum TokenType{
     //Single Character Tokens

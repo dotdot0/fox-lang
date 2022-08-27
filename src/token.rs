@@ -1,4 +1,4 @@
-
+#![allow(dead_code)]
 //use std::usize;
 
 use crate::token_type::*;
@@ -6,7 +6,7 @@ use crate::token_type::*;
 #[derive(Debug, Clone, PartialEq)]
 pub enum Object{
     Num(f32),
-    str(String),
+    Str(String),
     Bool(bool),
     Nil
 }
