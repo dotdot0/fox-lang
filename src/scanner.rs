@@ -24,6 +24,7 @@ impl Scanner{
     pub fn scan_tokens(&mut self) -> Result<&Vec<Token>, String>{
         while !self.is_at_end(){
             self.start = self.current;
+            //println!("{}", self.current);
             match self.scan_token(){
                 Ok(_) => (),
                 Err(e) => e.report(&self.source)
@@ -40,6 +41,7 @@ impl Scanner{
 
     fn scan_token(&mut self) -> Result<(), LoxError>{
         let c = self.advance();
+        //println!("{}", self.advance());
         match c{
             '(' => self.add_token(TokenType::LeftParen),
             ')' => self.add_token(TokenType::RightParen),
@@ -92,14 +94,15 @@ impl Scanner{
                     self.add_token(TokenType::Slash)
                 }
             },
-            '"' => match self.string(){
-                Ok(_) => (),
-                Err(e) => e.report(&self.source)
-            },
+            // '"' => match self.string(){
+            //     Ok(_) => (),
+            //     Err(e) => e.report(&self.source)
+            // },
             ' ' => (),
             '\r' => (),
             '\t' => (),
             '\n' => self.line += 1,
+            'q' => std::process::exit(64),
             _ => {
                 return Err(LoxError::error(self.line, "Unexpected Character".to_owned()));
             }
@@ -112,6 +115,7 @@ impl Scanner{
     fn advance(&mut self) -> char{
         let result = self.source.chars().nth(self.current).unwrap();
         self.current = self.current + 1;
+        //println!("{}", result);
         result
     }
 
