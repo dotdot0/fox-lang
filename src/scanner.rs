@@ -1,4 +1,6 @@
 #![allow(dead_code, unused_imports)]
+use std::collections::HashMap;
+
 use crate::{token::{*, self}, token_type::TokenType};
 use crate::error::LoxError;
 
@@ -27,7 +29,7 @@ impl Scanner{
             //println!("{}", self.current);
             match self.scan_token(){
                 Ok(_) => (),
-                Err(e) => e.report(&"".to_string())
+                Err(e) => e.report(&"Syntax Error".to_string())
             }  
         }
         self.tokens.push(Token::eof(self.line));
@@ -99,8 +101,12 @@ impl Scanner{
             '\r' => (),
             '\t' => (),
             '\n' => self.line += 1,
+            '0'..='9' => self.number(),
             'q' => std::process::exit(65),
-            _ => {
+            _ => if c.is_alphabetic(){
+                self.identifier();
+            }
+            else{
                 return Err(LoxError::error(self.line, "Unexpected Character".to_owned()));
             }
 
@@ -147,6 +153,15 @@ impl Scanner{
         }
     }
 
+    fn peek_next(&self) -> Option<char>{
+        if self.is_at_end(){
+            Some('\0')
+        }
+        else{
+            self.source.chars().nth(self.current + 1)
+        }
+    }
+
     fn string(&mut self) -> Result<(), LoxError>{
         while self.peek().unwrap() != '"' && !self.is_at_end(){
             if self.peek().unwrap() == '\n'{
@@ -161,10 +176,58 @@ impl Scanner{
         }
         else{
             self.advance();
-            let value: String = self.source[self.start + 1 .. self.current -1].to_string();
+            let value: String = self.source[self.start + 1 .. self.current -1].trim().to_string();
             self.add_token_object(TokenType::STRING, Some(Object::Str(value)));
             Ok(())
         }
     }
-    
+
+    fn number(&mut self){
+        while self.peek().unwrap().is_numeric(){
+            self.advance();
+        }
+        if self.peek().unwrap() == '.' && self.peek_next().unwrap().is_numeric(){
+            self.advance();//Consuming the .
+            while self.peek().unwrap().is_numeric(){
+                self.advance();
+            }
+        }
+        let value: f32 = self.source[self.start..self.current].to_string().parse().unwrap();
+        self.add_token_object(TokenType::Number, Some(Object::Num(value)))
+    }
+
+    fn identifier(&mut self){
+
+        //Reserved Keyword HashMap
+        let mut reserved_keyword: HashMap<&str, TokenType> = HashMap::new();
+
+        reserved_keyword.insert("class", TokenType::Class);
+        reserved_keyword.insert("and", TokenType::And);
+        reserved_keyword.insert("else", TokenType::Else);
+        reserved_keyword.insert("false", TokenType::False);
+        reserved_keyword.insert("true", TokenType::True);
+        reserved_keyword.insert("if", TokenType::If);
+        reserved_keyword.insert("fun", TokenType::Fun);
+        reserved_keyword.insert("nil", TokenType::Nil);
+        reserved_keyword.insert("print", TokenType::Print);
+        reserved_keyword.insert("return", TokenType::RETRUN);
+        reserved_keyword.insert("super", TokenType::Super);
+        reserved_keyword.insert("this", TokenType::This);
+        reserved_keyword.insert("var", TokenType::VAR);
+        reserved_keyword.insert("while", TokenType::WHILE);
+        reserved_keyword.insert("or", TokenType::Or);
+
+        while self.peek().unwrap().is_alphanumeric(){
+            self.advance();
+        }
+        let ident:&str = self.source[self.start..self.current].as_ref();
+        let tok = if reserved_keyword.contains_key(ident){
+            reserved_keyword.get(&ident).unwrap()
+        }else{
+            &TokenType::Identifier
+        };
+        self.add_token(*tok)
+    }
+
 }  
+
