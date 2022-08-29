@@ -85,15 +85,8 @@ impl Scanner{
                 };
                 self.add_token(tok);
             },
-            '/' => {
-                if self.is_match('/'){
-                    while self.peek().unwrap() != '\n' && !self.is_at_end() {
-                        self.advance();
-                    }
-                }else{
-                    self.add_token(TokenType::Slash)
-                }
-            },
+            '/' => self.add_token(TokenType::Slash),
+            '#' => {},
             '"' => match self.string(){
                 Ok(_) => (),
                 Err(e) => e.report(&self.source)
