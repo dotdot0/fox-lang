@@ -89,6 +89,17 @@ impl Scanner{
             },
             '/' => self.add_token(TokenType::Slash),
             '#' => {
+                if self.is_match('*'){
+                    while self.peek().unwrap() != '*' && self.peek_next().unwrap() != '#'{
+                        if self.peek().unwrap() == '\n'{
+                            self.line += 1;
+                            self.advance();
+                        }
+                        self.advance();
+                    }
+                }else{
+
+                }
                 while self.peek().unwrap() != '\n' && !self.is_at_end() {//Keep consuming character until next line ch;
                     self.advance();
                 }
