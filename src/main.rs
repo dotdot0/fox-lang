@@ -6,12 +6,13 @@ use scanner::Scanner;
 
 
 use std::env::args;
-use std::io::{self, Write};
+use std::io::{self, Write, Read};
+use std::fs::File;
 
 fn main() {
     let args: Vec<String> = args().collect();
 
-    if args.len() > 1{
+    if args.len() > 2{
       println!("Usage: jlox [script]");
       std::process::exit(64)
     }
@@ -24,7 +25,10 @@ fn main() {
 }
 
 fn run_file(file: &String){ 
-  println!("Running File: {file}")
+  let mut file: File = File::open(file).unwrap();
+  let mut file_content: String = String::new();
+  file.read_to_string(&mut file_content).unwrap();
+  run(file_content)
 }
 
 fn run_prompt(){

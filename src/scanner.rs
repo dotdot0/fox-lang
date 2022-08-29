@@ -86,7 +86,11 @@ impl Scanner{
                 self.add_token(tok);
             },
             '/' => self.add_token(TokenType::Slash),
-            '#' => {},
+            '#' => {
+                while self.peek().unwrap() != '\n' && !self.is_at_end() {//Keep consuming character until next line ch;
+                    self.advance();
+                }
+            },
             '"' => match self.string(){
                 Ok(_) => (),
                 Err(e) => e.report(&self.source)
