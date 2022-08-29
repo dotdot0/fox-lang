@@ -27,7 +27,7 @@ impl Scanner{
             //println!("{}", self.current);
             match self.scan_token(){
                 Ok(_) => (),
-                Err(e) => e.report(&self.source)
+                Err(e) => e.report(&"".to_string())
             }  
         }
         self.tokens.push(Token::eof(self.line));
@@ -94,15 +94,15 @@ impl Scanner{
                     self.add_token(TokenType::Slash)
                 }
             },
-            // '"' => match self.string(){
-            //     Ok(_) => (),
-            //     Err(e) => e.report(&self.source)
-            // },
+            '"' => match self.string(){
+                Ok(_) => (),
+                Err(e) => e.report(&self.source)
+            },
             ' ' => (),
             '\r' => (),
             '\t' => (),
             '\n' => self.line += 1,
-            'q' => std::process::exit(64),
+            'q' => std::process::exit(65),
             _ => {
                 return Err(LoxError::error(self.line, "Unexpected Character".to_owned()));
             }
@@ -156,6 +156,7 @@ impl Scanner{
                 self.line += 1;
                 self.advance();
             }
+            self.advance();
         }
 
         if self.is_at_end(){
