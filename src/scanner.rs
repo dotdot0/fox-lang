@@ -218,7 +218,7 @@ impl Scanner{
         reserved_keyword.insert("false", TokenType::False);
         reserved_keyword.insert("true", TokenType::True);
         reserved_keyword.insert("if", TokenType::If);
-        reserved_keyword.insert("fun", TokenType::Fun);
+        reserved_keyword.insert("fn", TokenType::Fun);
         reserved_keyword.insert("nil", TokenType::Nil);
         reserved_keyword.insert("print", TokenType::Print);
         reserved_keyword.insert("return", TokenType::RETRUN);
