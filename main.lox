@@ -1,6 +1,7 @@
-#*This is a comment
+#*
+This 
+is 
+a 
 Multiline
-ends with *#
-class {
-
-}
+comment
+*#
