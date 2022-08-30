@@ -32,7 +32,14 @@ fn run_file(file: &String){
 }
 
 fn run_prompt(){
+    println!(r#"|||        -----   \ \    / / "#);
+    println!(r#"|||       ||| |||   \ \  / /  "#);
+    println!(r#"|||       ||| |||    \ \/ /   "#);
+    println!(r#"|||       ||| |||    / /\ \   "#);
+    println!(r#"--------- ||| |||   / /  \ \  "#);
+    println!(r#"---------  -----   / /    \ \ "#);
   loop {
+    
     print!(">>>");
     let _ = io::stdout().flush();
     let mut input = String::new();
