@@ -2,6 +2,7 @@ mod token_type;
 mod token;
 mod scanner;
 mod error;
+mod ast;
 use scanner::Scanner;
 
 
