@@ -114,6 +114,16 @@ impl Scanner{
             '\n' => self.line += 1,
             '0'..='9' => self.number(),
             'q' => std::process::exit(65),
+            'e' => if self.is_match('x') {
+                std::process::exit(65);
+                // while self.peek().unwrap() != 't'{
+                //     self.advance();
+                // }
+                // let code: &str = &self.source[self.start..self.current].trim();
+                // if code == "exit"{
+                //     std::process::exit(65);
+                // }
+            },
             _ => if c.is_alphabetic(){
                 self.identifier();
             }
