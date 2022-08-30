@@ -107,9 +107,7 @@ impl Scanner{
             '"' => match self.string(){
                 Ok(_) => (),
                 Err(e) => e.report(&self.source)
-            },
-            ' ' => (),
-            '\r' => (),
+            },            '\r' => (),
             '\t' => (),
             '\n' => self.line += 1,
             '0'..='9' => self.number(),
