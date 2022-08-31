@@ -1,7 +1,3 @@
-#*
-This 
-is 
-a 
-Multiline
-comment
-*#
+fn main () {
+  let name = 3;
+}

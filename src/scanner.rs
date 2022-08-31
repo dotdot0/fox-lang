@@ -108,12 +108,12 @@ impl Scanner{
                 Ok(_) => (),
                 Err(e) => e.report(&self.source)
             },            '\r' => (),
-            '\t' => (),
+            ' ' | '\t' => (),
             '\n' => self.line += 1,
             '0'..='9' => self.number(),
             'q' => std::process::exit(65),
-            'e' => if self.is_match('x') {
-                std::process::exit(65);
+            //'e' => if self.is_match('x') {
+              //  std::process::exit(65);
                 // while self.peek().unwrap() != 't'{
                 //     self.advance();
                 // }
@@ -121,11 +121,12 @@ impl Scanner{
                 // if code == "exit"{
                 //     std::process::exit(65);
                 // }
-            },
-            _ => if c.is_alphabetic(){
+            //},
+            _ => if c.is_alphabetic() && !c.is_whitespace(){
                 self.identifier();
             }
             else{
+            
                 return Err(LoxError::error(self.line, "Unexpected Character".to_owned()));
             }
 
