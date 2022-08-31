@@ -217,35 +217,38 @@ impl Scanner{
 
     fn identifier(&mut self){
 
-        //Reserved Keyword HashMap
-        let mut reserved_keyword: HashMap<&str, TokenType> = HashMap::new();
-
-        reserved_keyword.insert("class", TokenType::Class);
-        reserved_keyword.insert("and", TokenType::And);
-        reserved_keyword.insert("else", TokenType::Else);
-        reserved_keyword.insert("false", TokenType::False);
-        reserved_keyword.insert("true", TokenType::True);
-        reserved_keyword.insert("if", TokenType::If);
-        reserved_keyword.insert("fn", TokenType::Fun);
-        reserved_keyword.insert("nil", TokenType::Nil);
-        reserved_keyword.insert("print", TokenType::Print);
-        reserved_keyword.insert("return", TokenType::RETRUN);
-        reserved_keyword.insert("super", TokenType::Super);
-        reserved_keyword.insert("this", TokenType::This);
-        reserved_keyword.insert("var", TokenType::VAR);
-        reserved_keyword.insert("while", TokenType::WHILE);
-        reserved_keyword.insert("or", TokenType::Or);
-
         while self.peek().unwrap().is_alphanumeric(){
             self.advance();
         }
         let ident:&str = self.source[self.start..self.current].as_ref();
-        let tok = if reserved_keyword.contains_key(ident){
-            reserved_keyword.get(&ident).unwrap()
-        }else{
-            &TokenType::Identifier
-        };
-        self.add_token(*tok)
+         let tok = self.reserved_keyword(ident);
+         //if reserved_keyword.contains_key(ident){
+        //     reserved_keyword.get(&ident).unwrap()
+        // }else{
+        //     &TokenType::Identifier
+        // };
+        self.add_token_object(tok.0, tok.1)
+    }
+
+    fn reserved_keyword(&self, ident: &str) -> (TokenType, Option<Object>){
+        match ident{
+            "class" => (TokenType::Class, None),
+            "super" => (TokenType::Super, None),
+            "and" => (TokenType::And, None),
+            "or" => (TokenType::Or, None),
+            "false" => (TokenType::False, Some(Object::Bool(false))),
+            "true" => (TokenType::True, Some(Object::Bool(true))),
+            "nil" => (TokenType::Nil, Some(Object::Nil)),
+            "if" => (TokenType::If, None),
+            "else" => (TokenType::Else, None),
+            "let" | "var" => (TokenType::VAR, None),
+            "this" => (TokenType::This, None),
+            "fn" => (TokenType::Fun, None),
+            "while" => (TokenType::WHILE, None),
+            "print" => (TokenType::Print, None),
+            "return" => (TokenType::RETRUN, None),
+            _ => (TokenType::Identifier, None)
+        }
     }
 
 }  
