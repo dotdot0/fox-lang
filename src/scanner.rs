@@ -229,7 +229,8 @@ impl Scanner{
         // };
         self.add_token_object(tok.0, tok.1)
     }
-
+    
+    //Checks if the provided identifier is reserved keyword
     fn reserved_keyword(&self, ident: &str) -> (TokenType, Option<Object>){
         match ident{
             "class" => (TokenType::Class, None),
