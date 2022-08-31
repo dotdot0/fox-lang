@@ -16,19 +16,21 @@ pub struct Token{
      ttype: TokenType,
      lexeme: String,
      literal: Option<Object>,
-     line: usize
+     line: usize,
+     column: usize
 }
 
 impl Token {
-    pub fn new(ttype: TokenType, lexeme: String, literal: Option<Object>, line:usize) -> Token{
+    pub fn new(ttype: TokenType, lexeme: String, literal: Option<Object>, line:usize, column: usize) -> Token{
         Token {
             ttype,
             lexeme,
             literal,
-            line
+            line,
+            column
         }
     }
     pub fn eof(line:usize) -> Token{
-        Token { ttype: TokenType::EOF, lexeme: "".to_owned(), literal: None, line }
+        Token { ttype: TokenType::EOF, lexeme: "".to_owned(), literal: None, line , column: 0}
     }
-}
+}  

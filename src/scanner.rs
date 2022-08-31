@@ -108,7 +108,7 @@ impl Scanner{
                 Ok(_) => (),
                 Err(e) => e.report(&self.source)
             },            '\r' => (),
-            ' ' | '\t' => (),
+            | ' ' | '\t' => (),
             '\n' => self.line += 1,
             '0'..='9' => self.number(),
             'q' => std::process::exit(65),
@@ -148,7 +148,7 @@ impl Scanner{
 
     fn add_token_object(&mut self, ttype: TokenType, literal: Option<Object>){
         let lexeme: String = self.source[self.start..self.current].to_string();
-        self.tokens.push(Token::new(ttype, lexeme, literal, self.line))
+        self.tokens.push(Token::new(ttype, lexeme, literal, self.line, self.current))
     }
 
     fn is_match(&mut self,expected: char) -> bool{
