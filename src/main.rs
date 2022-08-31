@@ -14,7 +14,7 @@ fn main() {
     let args: Vec<String> = args().collect();
 
     if args.len() > 2{
-      println!("Usage: jlox [script]");
+      println!("Usage: rlox [script]");
       std::process::exit(64)
     }
     else if args.len() == 2{
@@ -33,12 +33,11 @@ fn run_file(file: &String){
 }
 
 fn run_prompt(){
-    println!(r#"|||        -----   \ \    / / "#);
-    println!(r#"|||       ||| |||   \ \  / /  "#);
-    println!(r#"|||       ||| |||    \ \/ /   "#);
-    println!(r#"|||       ||| |||    / /\ \   "#);
-    println!(r#"--------- ||| |||   / /  \ \  "#);
-    println!(r#"---------  -----   / /    \ \ "#);
+
+    println!(r#" 
+    D#
+    "#);
+    
   loop {
     
     print!(">>>");
@@ -54,6 +53,6 @@ fn run(source: String) {
   let tokens = scanner.scan_tokens().unwrap(); 
 
   for token in tokens{
-    println!("{:?}", token)
+    println!("{:#?}", token)
   }
 }
