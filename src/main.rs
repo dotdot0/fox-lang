@@ -53,6 +53,6 @@ fn run(source: String) {
   let tokens = scanner.scan_tokens().unwrap(); 
 
   for token in tokens{
-    println!("{:#?}", token)
+    println!("{:?}", token)
   }
 }
