@@ -111,7 +111,12 @@ impl Scanner{
             | ' ' | '\t' => (),
             '\n' => self.line += 1,
             '0'..='9' => self.number(),
-            'q' => std::process::exit(65),
+            'q' => {if self.is_match('\n'){
+                std::process::exit(65)
+            }else {
+                self.identifier()
+            }
+        },
             //'e' => if self.is_match('x') {
               //  std::process::exit(65);
                 // while self.peek().unwrap() != 't'{
