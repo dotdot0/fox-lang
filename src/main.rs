@@ -1,11 +1,13 @@
+//Modules
 mod token_type;
 mod token;
 mod scanner;
 mod error;
 mod ast;
+mod parser;
+
+//Imports
 use scanner::Scanner;
-
-
 use std::env::args;
 use std::io::{self, Write, Read};
 use std::fs::File;
