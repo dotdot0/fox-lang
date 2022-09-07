@@ -13,11 +13,11 @@ pub enum Object{
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Token{
-     ttype: TokenType,
-     lexeme: String,
-     literal: Option<Object>,
-     line: usize,
-     column: usize
+     pub ttype: TokenType,
+     pub lexeme: String,
+     pub literal: Option<Object>,
+     pub line: usize,
+     pub column: usize
 }
 
 impl Token {
