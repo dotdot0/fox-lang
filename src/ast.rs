@@ -1,17 +1,18 @@
 #![allow(dead_code, unused)]
-use crate::token_type::{TokenType, self};
-use crate::token::Object;
+use crate::token_type::TokenType;
+use crate::token::{Object, Token};
 
+#[derive(Clone, PartialEq, Debug)]
 pub enum Expr{
   
   Binary{
     left: Box<Expr>,
-    operator: TokenType,
+    operator: Token,
     right: Box<Expr>
   },
 
   Unary{
-    operator: TokenType,
+    operator: Token,
     right: Box<Expr>
   },
 
@@ -21,7 +22,11 @@ pub enum Expr{
 
   Grouping{
     expression: Box<Expr>
-  }
+  },
 
+  LetStatement{
+    name: TokenType,
+    value: Box<Expr>
+  }
 
 }
