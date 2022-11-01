@@ -111,6 +111,7 @@ impl Parser{
     false
   }
 
+  //For Error
   fn consume(&mut self, ttype: TokenType, message: String) -> Result<Token, ParseError>{
     if self.check(ttype){
       Ok(self.advance())
