@@ -25,8 +25,14 @@ pub enum Expr{
   },
 
   LetStatement{
-    name: TokenType,
+    name: Identifier,
     value: Box<Expr>
   }
 
+}
+
+#[derive(Debug, Clone, PartialEq)]
+struct Identifier{
+  token: Token,
+  name: String
 }

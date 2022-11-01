@@ -8,6 +8,7 @@ mod parser;
 
 //Imports
 use scanner::Scanner;
+use parser::Parser;
 use std::env::args;
 use std::io::{self, Write, Read};
 use std::fs::File;
@@ -53,8 +54,7 @@ fn run_prompt(){
 fn run(source: String) {
   let mut scanner: Scanner = Scanner::new(source);
   let tokens = scanner.scan_tokens().unwrap(); 
-
-  for token in tokens{
-    println!("{:?}", token)
-  }
+  let mut parser = Parser::new(tokens.clone());
+  let expr = parser.parse();
+  println!("{:?}", expr)
 }
