@@ -87,15 +87,27 @@ impl Parser{
     if self.is_match(vec![TokenType::False]) { 
       return Expr::Literal { value: Some(Object::Bool(false)) };
     }
+
     else if self.is_match(vec![TokenType::True]){
       return Expr::Literal { value: Some(Object::Bool(true)) };
     }
+
     else if self.is_match(vec![TokenType::Nil]){
       return Expr::Literal { value: Some(Object::Nil) };
     }
+
     else if self.is_match(vec![TokenType::STRING, TokenType::Number]){
       return Expr::Literal { value: self.previous().literal };
     }
+
+    else if self.is_match(vec![TokenType::LeftParen]){
+      let mut expr = self.expression();
+
+      self.consume(TokenType::RightParen, String::from("Expect ) after expression."));
+
+      Expr::Grouping { expression: Box::new(expr) }
+    }
+    
     else{
       Expr::Literal { value: None }
     }

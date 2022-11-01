@@ -1,3 +1,4 @@
+#![allow(unused, dead_code)]
 use crate::token::Token;
 
 pub struct LoxError{

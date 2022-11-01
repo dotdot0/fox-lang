@@ -32,7 +32,7 @@ pub enum Expr{
 }
 
 #[derive(Debug, Clone, PartialEq)]
-struct Identifier{
+pub struct Identifier{
   token: Token,
   name: String
 }

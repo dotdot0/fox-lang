@@ -64,5 +64,5 @@ fn run(source: String) {
   let tokens = scanner.scan_tokens().unwrap(); 
   let mut parser = Parser::new(tokens.clone());
   let expr = parser.parse();
-  println!("{:?}", expr)
+  println!("{:#?}", expr)
 }
