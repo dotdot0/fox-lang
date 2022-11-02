@@ -6,6 +6,7 @@ mod error;
 mod ast;
 mod parser;
 
+use error::LoxError;
 //Imports
 use scanner::Scanner;
 use parser::Parser;
@@ -63,6 +64,12 @@ fn run(source: String) {
   let mut scanner: Scanner = Scanner::new(source);
   let tokens = scanner.scan_tokens().unwrap(); 
   let mut parser = Parser::new(tokens.clone());
-  let expr = parser.parse();
-  println!("{:#?}", expr)
+  let mut expr = parser.parse();
+  if expr.is_ok(){
+    println!("{:#?}", expr.unwrap())
+  }
+  else{
+    let error = expr.err().unwrap();
+    error.report(&String::from(""));
+  }
 }
