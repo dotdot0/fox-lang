@@ -1,5 +1,5 @@
 #![allow(unused)]
-use crate::{token::Token, ast::Expr, token_type::TokenType, token::Object, error::LoxError};
+use crate::{token::Token, ast::{Expr, Stmt}, token_type::{TokenType, self}, token::Object, error::LoxError};
 
 pub struct Parser{
   tokens: Vec<Token>,
@@ -8,6 +8,13 @@ pub struct Parser{
 
 type ParseError = Result<Expr, LoxError>;
 
+// program        → statement* EOF ;
+
+// statement      → exprStmt
+//                | printStmt ;
+
+// exprStmt       → expression ";" ;
+// printStmt      → "print" expression ";" ;
 // expression     → equality ;
 // equality       → comparison ( ( "!=" | "==" ) comparison )* ;
 // comparison     → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
@@ -24,9 +31,39 @@ impl Parser{
     Self { tokens, current: 0 }
   }
 
-  pub fn parse(&mut self) -> ParseError{
-    self.expression()
+  pub fn parse(&mut self) -> Result<Vec<Stmt>, LoxError>{
+    let mut statements: Vec<Stmt> = Vec::new();
+    while !self.is_at_end() {
+        statements.push(self.statement()?)
+    }
+    Ok(statements)
   }
+
+  fn statement(&mut self) -> Result<Stmt, LoxError>{
+    if self.is_match(vec![TokenType::Print]){
+      return Ok(self.print_statement()?);
+    }
+    Ok(self.expression_statement()?)
+  }
+
+  fn print_statement(&mut self) -> Result<Stmt, LoxError>{
+    let value = self.expression()?;
+    if self.consume(TokenType::Semicolon, String::from("Expect ; after the value")).is_err(){
+      Err(LoxError::error(self.previous().line, String::from("Expect ; after the expression")))
+    }else{
+      Ok(Stmt::Print { value: Box::new(value) })
+    }
+  }
+
+  fn expression_statement(&mut self) -> Result<Stmt, LoxError>{
+    let value = self.expression()?;
+    if self.consume(TokenType::Semicolon, String::from("Expect ; after the value")).is_err(){
+      Err(LoxError::error(self.previous().line, String::from("Expect ; after the expression")))
+    }
+    else{
+      Ok(Stmt::Expression { value: Box::new(value) })
+    }
+  } 
 
   fn expression(&mut self) -> ParseError{
     self.equality()

@@ -2,6 +2,18 @@
 use crate::token_type::TokenType;
 use crate::token::{Object, Token};
 
+#[derive(Debug, PartialEq, Clone)]
+pub enum Stmt{
+  Print{
+    value: Box<Expr>
+  },
+
+  Expression{
+    value: Box<Expr>
+  }
+}
+
+
 #[derive(Clone, PartialEq, Debug)]
 pub enum Expr{
   
@@ -24,15 +36,5 @@ pub enum Expr{
     expression: Box<Expr>
   },
 
-  LetStatement{
-    name: Identifier,
-    value: Box<Expr>
-  }
-
 }
 
-#[derive(Debug, Clone, PartialEq)]
-pub struct Identifier{
-  token: Token,
-  name: String
-}
