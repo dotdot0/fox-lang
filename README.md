@@ -5,7 +5,9 @@
 ## Progress
 - [x] Lexer/Scanner
 - [x] Basic REPL
-- [ ]  Parser(WIP)
-- [ ]  Interpreter
+- [ ] Error Handling
+- [ ] Parser(WIP)(A recursive descent parser)
+- [ ] Interpreter
 
-### Open for contribution just open a issue with your suggestion
+
+Have any suggestion feel free to open a issue.
