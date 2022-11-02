@@ -3,7 +3,7 @@
 ### A tree walk iterpreter written in rust
 
 ## Progress
-- [:heavy_check_mark:] Lexer/Scanner
+- [x] Lexer/Scanner
 - [x] Basic REPL
 - [ ] Error Handling
 - [ ] Parser(WIP)(A recursive descent parser)
