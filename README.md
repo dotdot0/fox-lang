@@ -1,4 +1,5 @@
-Lox Interpreter Written In Rust
+# fox-lang
 
-Comment starts with #
-Not //
+A tree walk iterpreter written in rust
+
+- [x] Lexer/Scanner
