@@ -72,7 +72,8 @@ impl Parser{
 
   fn var_declaration(&mut self) -> Result<Stmt, LoxError>{
     let mut initializer: Option<Expr> = None;
-    if self.consume(TokenType::Identifier, String::from("Expect variable name")).is_err(){
+    let name = self.consume(TokenType::Identifier, String::from("Expect variable name."));
+    if name.is_err(){
       Err(LoxError::error(self.previous().line, String::from("Expect variable name.")))
     }
     else if self.is_match(vec![TokenType::Equal]){
@@ -80,7 +81,7 @@ impl Parser{
       if self.consume(TokenType::Semicolon, String::from("Expect ';' after variable declaration.")).is_err(){
         return Err(LoxError::error(self.previous().line, String::from("Expect ';' after variable declaration")));
       }else{
-        return Ok(Stmt::Var { name: self.previous(), initializer: Box::new(initializer.unwrap()) });
+        return Ok(Stmt::Var { name: name.unwrap(), initializer: Box::new(initializer.unwrap()) });
       }
     }
     else {
