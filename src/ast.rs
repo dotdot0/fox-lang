@@ -43,8 +43,12 @@ pub enum Expr{
 
   Variable{
     name: Token
-  }
+  },
 
+  Assigment{
+    name: Token,
+    value: Box<Expr>
+  }
 
 }
 

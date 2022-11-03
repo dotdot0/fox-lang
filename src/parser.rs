@@ -18,7 +18,10 @@ type ParseError = Result<Expr, LoxError>;
 // varDecl        → "let" IDENTIFIER ( "=" expression )? ";" ;
 // exprStmt       → expression ";" ;
 // printStmt      → "print" expression ";" ;
-// expression     → equality ;
+// expression     → equality 
+//                | assigment ;
+// assigment      → IDENTIFIER "=" assigment 
+//                | equality;
 // equality       → comparison ( ( "!=" | "==" ) comparison )* ;
 // comparison     → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
 // term           → factor ( ( "-" | "+" ) factor )* ;
@@ -81,7 +84,7 @@ impl Parser{
       }
     }
     else {
-        Err(LoxError::error(self.previous().line, String::from("Expect value for variable.")))
+      Ok(Stmt::Var { name: self.previous(), initializer: Box::new(Expr::Literal { value: Some(Object::Nil) }) })
     }
   }
 
