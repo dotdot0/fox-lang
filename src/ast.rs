@@ -10,6 +10,11 @@ pub enum Stmt{
 
   Expression{
     value: Box<Expr>
+  },
+
+  Var{
+    name: Token,
+    initializer: Box<Expr>
   }
 }
 
@@ -35,6 +40,11 @@ pub enum Expr{
   Grouping{
     expression: Box<Expr>
   },
+
+  Variable{
+    name: Token
+  }
+
 
 }
 

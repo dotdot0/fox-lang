@@ -8,11 +8,14 @@ pub struct Parser{
 
 type ParseError = Result<Expr, LoxError>;
 
-// program        → statement* EOF ;
+// program        → declaration* EOF ;
+
+// declaration    → varDecl
+//                | statement ;
 
 // statement      → exprStmt
 //                | printStmt ;
-
+// varDecl        → "let" IDENTIFIER ( "=" expression )? ";" ;
 // exprStmt       → expression ";" ;
 // printStmt      → "print" expression ";" ;
 // expression     → equality ;
@@ -23,7 +26,7 @@ type ParseError = Result<Expr, LoxError>;
 // unary          → ( "!" | "-" ) unary
 //                | primary ;
 // primary        → NUMBER | STRING | "true" | "false" | "nil"
-//                | "(" expression ")" ;
+//                | "(" expression ")" | IDENTIFIER;
 //                   ^^^^^^^^^^^^^^^^ -> Grouping
 
 impl Parser{
@@ -34,9 +37,18 @@ impl Parser{
   pub fn parse(&mut self) -> Result<Vec<Stmt>, LoxError>{
     let mut statements: Vec<Stmt> = Vec::new();
     while !self.is_at_end() {
-        statements.push(self.statement()?)
+        statements.push(self.declaration()?)
     }
     Ok(statements)
+  }
+
+  fn declaration(&mut self) -> Result<Stmt, LoxError>{
+    if self.is_match(vec![TokenType::VAR]){
+      Ok(self.var_declaration()?)
+    }
+    else{
+      Ok(self.statement()?)
+    }
   }
 
   fn statement(&mut self) -> Result<Stmt, LoxError>{
@@ -52,6 +64,24 @@ impl Parser{
       Err(LoxError::error(self.previous().line, String::from("Expect ; after the expression")))
     }else{
       Ok(Stmt::Print { value: Box::new(value) })
+    }
+  }
+
+  fn var_declaration(&mut self) -> Result<Stmt, LoxError>{
+    let mut initializer: Option<Expr> = None;
+    if self.consume(TokenType::Identifier, String::from("Expect variable name")).is_err(){
+      Err(LoxError::error(self.previous().line, String::from("Expect variable name.")))
+    }
+    else if self.is_match(vec![TokenType::Equal]){
+      initializer = Some(self.expression()?);
+      if self.consume(TokenType::Semicolon, String::from("Expect ';' after variable declaration.")).is_err(){
+        return Err(LoxError::error(self.previous().line, String::from("Expect ';' after variable declaration")));
+      }else{
+        return Ok(Stmt::Var { name: self.previous(), initializer: Box::new(initializer.unwrap()) });
+      }
+    }
+    else {
+        Err(LoxError::error(self.previous().line, String::from("Expect value for variable.")))
     }
   }
 
@@ -142,11 +172,17 @@ impl Parser{
     else if self.is_match(vec![TokenType::LeftParen]){
       let mut expr = self.expression()?;
 
-      self.consume(TokenType::RightParen, String::from("Expect ) after expression."));
-
-      Ok(Expr::Grouping { expression: Box::new(expr) })
-    }else{
-      Err(LoxError::error(self.previous().line, String::from("Expect ) after expression")))
+      if self.consume(TokenType::RightParen, String::from("Expect ) after expression.")).is_err(){
+        Err(LoxError::error(self.previous().line, String::from("Expect ) after expression.")))
+      }
+      else{
+        Ok(Expr::Grouping { expression: Box::new(expr) })
+      }
+    }else if self.is_match(vec![TokenType::Identifier]){
+      Ok(Expr::Variable { name: self.previous() })
+    }
+    else {
+        Ok(Expr::Literal { value: None })
     }
   }
 
