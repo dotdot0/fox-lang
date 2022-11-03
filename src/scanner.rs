@@ -250,7 +250,7 @@ impl Scanner{
             "nil" => (TokenType::Nil, Some(Object::Nil)),
             "if" => (TokenType::If, None),
             "else" => (TokenType::Else, None),
-            "let" | "var" => (TokenType::VAR, None),
+            "let" => (TokenType::VAR, None),
             "this" => (TokenType::This, None),
             "fn" => (TokenType::Fun, None),
             "while" => (TokenType::WHILE, None),
