@@ -1,6 +1,6 @@
 # fox-lang
 
-### A tree walk iterpreter written in rust
+### A tree walk interpreter written in rust
 
 ## Progress
 - [x] Lexer/Scanner
