@@ -17,7 +17,9 @@ declaration    → varDecl
 statement      → exprStmt
                | ifStmt
                | printStmt
-               | block ;
+               | block 
+               | whileStmt;
+whileStmt      → "while" "(" expression ")" statement ;
 ifStmt         → "if" "(" expression ")" statement
                ( "else" statement )? ;
 block          → "{" declaration* "}" ;
@@ -27,7 +29,9 @@ printStmt      → "print" expression ";" ;
 expression     → equality 
                | assigment ;
 assigment      → IDENTIFIER "=" assigment 
-               | equality;
+               | logic_or;
+logic_or       → logic_and ( "or" logic_and )* ;
+logic_and      → equality ( "and" equality )* ;
 equality       → comparison ( ( "!=" | "==" ) comparison )* ;
 comparison     → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
 term           → factor ( ( "-" | "+" ) factor )* ;
@@ -70,6 +74,9 @@ impl Parser{
     }
     else if self.is_match(vec![TokenType::If]){
       return Ok(self.if_statement()?);
+    }
+    else if self.is_match(vec![TokenType::WHILE]){
+      return Ok(self.while_statement()?);
     }
     Ok(self.expression_statement()?)
   }
@@ -134,6 +141,24 @@ impl Parser{
     }
   }
 
+  fn while_statement(&mut self) -> Result<Stmt, LoxError>{
+    let mut expr: Option<Expr> = None;
+    let mut stmt: Option<Stmt> = None;
+    if self.consume(TokenType::LeftParen, String::from("(")).is_err(){
+      return Err(LoxError::error(self.previous().line, String::from("Expect '(' after 'while'.")));
+    }
+    else{
+      expr = Some(self.expression()?);
+    }
+    if self.consume(TokenType::RightParen, String::from(")")).is_err(){
+      return Err(LoxError::error(self.previous().line, String::from("Expect ')' after condition.")));
+    }
+    else{
+      stmt = Some(self.statement()?);
+    }
+    Ok(Stmt::While { condition: Box::new(expr.unwrap()), body: Box::new(stmt.unwrap()) })
+  }
+
   fn expression_statement(&mut self) -> Result<Stmt, LoxError>{
     let value = self.expression()?;
     if self.consume(TokenType::Semicolon, String::from("Expect ; after the value")).is_err(){
@@ -149,7 +174,7 @@ impl Parser{
   }
   
   fn assigment(&mut self) -> ParseError{
-    let mut expr = self.equality()?;
+    let mut expr = self.or()?;
 
     if self.is_match(vec![TokenType::Equal]){
       let equal = self.previous();
@@ -164,6 +189,28 @@ impl Parser{
       }
     }
 
+    Ok(expr)
+  }
+
+  fn or(&mut self) -> ParseError{
+    let mut expr = self.and()?;
+
+    while self.is_match(vec![TokenType::Or]) {
+      let operator = self.previous();
+      let right = self.and()?;
+      expr = Expr::Logical { left: Box::new(expr), operator, right: Box::new(right) }
+    }
+    Ok(expr)
+  }
+
+  fn and(&mut self) -> ParseError{
+    let mut expr = self.equality()?;
+
+    while self.is_match(vec![TokenType::And]) {
+      let operator = self.previous();
+      let right = self.equality()?;
+      expr = Expr::Logical { left: Box::new(expr), operator, right: Box::new(right) }  
+    }
     Ok(expr)
   }
 

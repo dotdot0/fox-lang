@@ -1,13 +1,4 @@
 let name = "Pratush";
-
-if (name == "Pratush"){
-  print "Master";
-  if (n == 3){
-    print 3;
-  }else{
-    print 0;
-  }
+while (true) {
+  print name;
 }
-#else{
-  #print "Fuck Off!";
-#}
