@@ -15,6 +15,10 @@ pub enum Stmt{
   Var{
     name: Token,
     initializer: Box<Expr>
+  },
+
+  Block{
+    statements: Vec<Box<Stmt>>
   }
 }
 

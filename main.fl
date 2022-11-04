@@ -1,2 +1,10 @@
 let name = "Pratush";
+
+{
+let a = "global a";
+let b = "global b";
+let c = "global c";
+ {}
+}
+
 print name;

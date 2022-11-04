@@ -12,7 +12,9 @@ type ParseError = Result<Expr, LoxError>;
 // declaration    → varDecl
 //                | statement ;
 // statement      → exprStmt
-//                | printStmt ;
+//                | printStmt
+//                | block ;
+// block          → "{" declaration* "}" ;
 // varDecl        → "let" IDENTIFIER ( "=" expression )? ";" ;
 // exprStmt       → expression ";" ;
 // printStmt      → "print" expression ";" ;
@@ -56,7 +58,23 @@ impl Parser{
     if self.is_match(vec![TokenType::Print]){
       return Ok(self.print_statement()?);
     }
+    else if self.is_match(vec![TokenType::LeftBrace]){
+      return Ok(Stmt::Block { statements: self.block()? });
+    }
     Ok(self.expression_statement()?)
+  }
+
+  fn block(&mut self) -> Result<Vec<Box<Stmt>>, LoxError>{
+    let mut statements: Vec<Box<Stmt>> = Vec::new();
+
+    while !self.check(TokenType::RightBrace) && !self.is_at_end(){
+      statements.push(Box::new(self.declaration()?))
+    }
+
+    if self.consume(TokenType::RightBrace, String::from("}")).is_err(){
+      return Err(LoxError::error(self.previous().line, String::from("Expect '}' after block.")));
+    }
+    Ok(statements)
   }
 
   fn print_statement(&mut self) -> Result<Stmt, LoxError>{
