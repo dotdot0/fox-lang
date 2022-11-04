@@ -9,10 +9,8 @@ pub struct Parser{
 type ParseError = Result<Expr, LoxError>;
 
 // program        → declaration* EOF ;
-
 // declaration    → varDecl
 //                | statement ;
-
 // statement      → exprStmt
 //                | printStmt ;
 // varDecl        → "let" IDENTIFIER ( "=" expression )? ";" ;
@@ -97,10 +95,29 @@ impl Parser{
     else{
       Ok(Stmt::Expression { value: Box::new(value) })
     }
-  } 
+  }
 
   fn expression(&mut self) -> ParseError{
-    self.equality()
+    self.assigment()
+  }
+  
+  fn assigment(&mut self) -> ParseError{
+    let mut expr = self.equality()?;
+
+    if self.is_match(vec![TokenType::Equal]){
+      let equal = self.previous();
+      let value = self.assigment()?;
+
+      match expr {
+          Expr::Variable { name } => {
+            return Ok(Expr::Assigment { name, value: Box::new(value) })
+          },
+          _ => {
+            return Err(LoxError::error(self.previous().line, String::from("Invalid assigment target.")))}
+      }
+    }
+
+    Ok(expr)
   }
 
   fn equality(&mut self) -> ParseError{
