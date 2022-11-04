@@ -1,4 +1,6 @@
 #![allow(unused)]
+use std::panic::set_hook;
+
 use crate::{token::Token, ast::{Expr, Stmt}, token_type::{TokenType, self}, token::Object, error::LoxError};
 
 pub struct Parser{
@@ -8,29 +10,34 @@ pub struct Parser{
 
 type ParseError = Result<Expr, LoxError>;
 
-// program        → declaration* EOF ;
-// declaration    → varDecl
-//                | statement ;
-// statement      → exprStmt
-//                | printStmt
-//                | block ;
-// block          → "{" declaration* "}" ;
-// varDecl        → "let" IDENTIFIER ( "=" expression )? ";" ;
-// exprStmt       → expression ";" ;
-// printStmt      → "print" expression ";" ;
-// expression     → equality 
-//                | assigment ;
-// assigment      → IDENTIFIER "=" assigment 
-//                | equality;
-// equality       → comparison ( ( "!=" | "==" ) comparison )* ;
-// comparison     → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
-// term           → factor ( ( "-" | "+" ) factor )* ;
-// factor         → unary ( ( "/" | "*" ) unary )* ;
-// unary          → ( "!" | "-" ) unary
-//                | primary ;
-// primary        → NUMBER | STRING | "true" | "false" | "nil"
-//                | "(" expression ")" | IDENTIFIER;
-//                   ^^^^^^^^^^^^^^^^ -> Grouping
+/* 
+program        → declaration* EOF ;
+declaration    → varDecl
+               | statement ;
+statement      → exprStmt
+               | ifStmt
+               | printStmt
+               | block ;
+ifStmt         → "if" "(" expression ")" statement
+               ( "else" statement )? ;
+block          → "{" declaration* "}" ;
+varDecl        → "let" IDENTIFIER ( "=" expression )? ";" ;
+exprStmt       → expression ";" ;
+printStmt      → "print" expression ";" ;
+expression     → equality 
+               | assigment ;
+assigment      → IDENTIFIER "=" assigment 
+               | equality;
+equality       → comparison ( ( "!=" | "==" ) comparison )* ;
+comparison     → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
+term           → factor ( ( "-" | "+" ) factor )* ;
+factor         → unary ( ( "/" | "*" ) unary )* ;
+unary          → ( "!" | "-" ) unary
+               | primary ;
+primary        → NUMBER | STRING | "true" | "false" | "nil"
+               | "(" expression ")" | IDENTIFIER;
+                  ^^^^^^^^^^^^^^^^ -> Grouping
+*/
 
 impl Parser{
   pub fn new(tokens: Vec<Token>) -> Self{
@@ -61,7 +68,29 @@ impl Parser{
     else if self.is_match(vec![TokenType::LeftBrace]){
       return Ok(Stmt::Block { statements: self.block()? });
     }
+    else if self.is_match(vec![TokenType::If]){
+      return Ok(self.if_statement()?);
+    }
     Ok(self.expression_statement()?)
+  }
+
+  fn if_statement(&mut self) -> Result<Stmt, LoxError>{
+    let mut condition: Option<Expr> = None;
+    if self.consume(TokenType::LeftParen, String::from("(")).is_err(){
+      return Err(LoxError::error(self.previous().line, String::from("Expect '(' after 'if'.")));
+    }
+    else{
+      condition = Some(self.expression()?);
+      if !self.consume(TokenType::RightParen, String::from("Expect ')' after if condition.")).is_ok(){
+        return Err(LoxError::error(self.previous().line, String::from("Expect ')' after if condition.")));
+      }
+    }
+    let then_branch = self.statement()?;
+    let mut else_branch = None;
+    if self.is_match(vec![TokenType::Else]){
+      else_branch = Some(self.statement()?)
+    }
+    Ok(Stmt::If { condition: Box::new(condition.unwrap()), then_branch: Box::new(then_branch), else_branch: Box::new(else_branch) })
   }
 
   fn block(&mut self) -> Result<Vec<Box<Stmt>>, LoxError>{
@@ -241,7 +270,7 @@ impl Parser{
       Ok(self.advance())
     }
     else {
-      Err(LoxError::error(self.current, String::from("Expect ) at the end ")))
+      Err(LoxError::error(self.previous().line, String::from("Expect ) at the end ")))
     }
   }
 

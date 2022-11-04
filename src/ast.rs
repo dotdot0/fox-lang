@@ -19,6 +19,12 @@ pub enum Stmt{
 
   Block{
     statements: Vec<Box<Stmt>>
+  },
+
+  If{
+    condition: Box<Expr>,
+    then_branch: Box<Stmt>,
+    else_branch: Box<Option<Stmt>>
   }
 }
 
@@ -52,6 +58,12 @@ pub enum Expr{
   Assigment{
     name: Token,
     value: Box<Expr>
+  },
+
+  Logical{
+    left: Box<Expr>,
+    operator: Token,
+    right: Box<Expr>
   }
 
 }

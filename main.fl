@@ -1,10 +1,13 @@
 let name = "Pratush";
 
-{
-let a = "global a";
-let b = "global b";
-let c = "global c";
- {}
+if (name == "Pratush"){
+  print "Master";
+  if (n == 3){
+    print 3;
+  }else{
+    print 0;
+  }
 }
-
-print name;
+#else{
+  #print "Fuck Off!";
+#}
