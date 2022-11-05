@@ -1,4 +1,12 @@
-let name = "Pratush";
-while (true) {
+fn main("dasld"){
   print name;
-}
+  let name = "RP";
+  if (name == "RP"){
+    print "yo!";
+  }else{
+    print "Fuck!";
+  }
+  while (true){
+    print true;
+  }
+};

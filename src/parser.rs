@@ -12,8 +12,11 @@ type ParseError = Result<Expr, LoxError>;
 
 /* 
 program        → declaration* EOF ;
-declaration    → varDecl
+declaration    → funDecl
+               | varDecl
                | statement ;
+funDecl        → "fun" function ;
+function       → IDENTIFIER "(" parameters? ")" block ;
 statement      → exprStmt
                | ifStmt
                | printStmt
@@ -38,6 +41,8 @@ term           → factor ( ( "-" | "+" ) factor )* ;
 factor         → unary ( ( "/" | "*" ) unary )* ;
 unary          → ( "!" | "-" ) unary
                | primary ;
+call           → primary ( "(" arguments? ")" )* ;
+arguments      → expression ( "," expression )* ;
 primary        → NUMBER | STRING | "true" | "false" | "nil"
                | "(" expression ")" | IDENTIFIER;
                   ^^^^^^^^^^^^^^^^ -> Grouping
@@ -59,6 +64,9 @@ impl Parser{
   fn declaration(&mut self) -> Result<Stmt, LoxError>{
     if self.is_match(vec![TokenType::VAR]){
       Ok(self.var_declaration()?)
+    }
+    else if self.is_match(vec![TokenType::Fun]){
+      self.function("function")
     }
     else{
       Ok(self.statement()?)
@@ -169,6 +177,35 @@ impl Parser{
     }
   }
 
+  fn function(&mut self, kind: &str) -> Result<Stmt, LoxError>{
+    let name = self.consume(TokenType::Identifier, String::from("Ident"));
+    if name.is_err(){
+      return Err(LoxError::error(self.previous().line, String::from(format!("Expect {kind} name."))));
+    }
+    else if self.consume(TokenType::LeftParen, String::from("(")).is_err(){
+      return Err(LoxError::error(self.previous().line, String::from(format!("Expect '(' after {kind} name."))));
+    }
+    let mut params: Vec<Token> = Vec::new();
+    if !self.check(TokenType::RightParen){
+      let param = self.consume(TokenType::Identifier, String::from("Ident"));
+      if param.is_err(){
+        return Err(LoxError::error(self.previous().line, String::from("Expect parameter name.")));
+      }
+      params.push(param.unwrap());
+      while self.is_match(vec![TokenType::Comma]) {
+          params.push(self.consume(TokenType::Identifier, String::from("Ident")).unwrap())
+      }
+    }
+    else if self.consume(TokenType::RightParen, String::from(")")).is_err() {
+      return Err(LoxError::error(self.previous().line, String::from("Expect ')' after parameters.")));
+    }
+    else if self.consume(TokenType::LeftBrace, String::from("{")).is_err(){
+      return Err(LoxError::error(self.previous().line, String::from(format!("Expect before {kind} body."))));
+    }
+    let body: Vec<Box<Stmt>> = self.block()?;
+    Ok(Stmt::Function { name: name.unwrap(), params, body })
+  }
+
   fn expression(&mut self) -> ParseError{
     self.assigment()
   }
@@ -264,7 +301,41 @@ impl Parser{
       let expr = self.unary()?;
       return Ok(Expr::Unary { operator, right: Box::new(expr) });
     }
-    self.primary()
+    self.call()
+  }
+
+  fn finish_call(&mut self, callee: Expr) -> ParseError{
+    let mut arguments: Vec<Box<Expr>> = Vec::new();
+    
+    if !self.check(TokenType::RightParen){
+      arguments.push(Box::new(self.expression()?));
+      while self.is_match(vec![TokenType::Comma]) {
+          if arguments.len() >= 255{
+            return Err(LoxError::error(self.previous().line, String::from("Can't have more than 255 arguments.")));
+          }
+          arguments.push(Box::new(self.expression()?))
+      }
+    }
+
+    let paren = self.consume(TokenType::RightParen, String::from(")"));
+    if paren.is_err(){
+      return Err(LoxError::error(self.previous().line, String::from("Expect ')' after arguments.")));
+    }
+
+    Ok(Expr::Call { callee: Box::new(callee), paren: paren.unwrap(), arguments })
+  }
+
+  fn call(&mut self) -> ParseError{
+    let mut expr = self.primary()?;
+
+    loop{
+        if self.is_match(vec![TokenType::LeftParen]){
+          expr = self.finish_call(expr)?;
+        }else{
+          break;
+        }
+    }
+    Ok(expr)
   }
 
   fn primary(&mut self) -> ParseError{
