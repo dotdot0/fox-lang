@@ -1,12 +1,5 @@
-fn main("dasld"){
-  print name;
-  let name = "RP";
-  if (name == "RP"){
-    print "yo!";
-  }else{
-    print "Fuck!";
-  }
-  while (true){
-    print true;
-  }
-};
+fn sayHi(first, last) {
+  return first + last;
+}
+
+let name = sayHi("Dear", "Reader");

@@ -1,5 +1,5 @@
 #![allow(unused)]
-use std::panic::set_hook;
+
 
 use crate::{token::Token, ast::{Expr, Stmt}, token_type::{TokenType, self}, token::Object, error::LoxError};
 
@@ -21,7 +21,9 @@ statement      → exprStmt
                | ifStmt
                | printStmt
                | block 
-               | whileStmt;
+               | whileStmt
+               | returnStmt ;
+returnStmt     → "return" expression? ";" ;
 whileStmt      → "while" "(" expression ")" statement ;
 ifStmt         → "if" "(" expression ")" statement
                ( "else" statement )? ;
@@ -75,16 +77,19 @@ impl Parser{
 
   fn statement(&mut self) -> Result<Stmt, LoxError>{
     if self.is_match(vec![TokenType::Print]){
-      return Ok(self.print_statement()?);
+      return self.print_statement();
     }
     else if self.is_match(vec![TokenType::LeftBrace]){
       return Ok(Stmt::Block { statements: self.block()? });
     }
     else if self.is_match(vec![TokenType::If]){
-      return Ok(self.if_statement()?);
+      return self.if_statement();
     }
     else if self.is_match(vec![TokenType::WHILE]){
-      return Ok(self.while_statement()?);
+      return self.while_statement();
+    }
+    else if self.is_match(vec![TokenType::RETRUN]){
+      return self.return_statement();
     }
     Ok(self.expression_statement()?)
   }
@@ -128,6 +133,19 @@ impl Parser{
     }else{
       Ok(Stmt::Print { value: Box::new(value) })
     }
+  }
+
+  fn return_statement(&mut self) -> Result<Stmt, LoxError>{
+    let keyword = self.previous();
+    let mut value: Option<Expr> = None;
+    if !self.check(TokenType::Semicolon){
+      value = Some(self.expression()?)
+    }
+
+    if self.consume(TokenType::Semicolon, String::from(";")).is_err(){
+      return Err(LoxError::error(self.previous().line, String::from("Expect ';' after return statement.")));
+    }
+    Ok(Stmt::Return { keyword, value: Box::new(value.unwrap()) })
   }
 
   fn var_declaration(&mut self) -> Result<Stmt, LoxError>{
@@ -187,16 +205,16 @@ impl Parser{
     }
     let mut params: Vec<Token> = Vec::new();
     if !self.check(TokenType::RightParen){
-      let param = self.consume(TokenType::Identifier, String::from("Ident"));
-      if param.is_err(){
-        return Err(LoxError::error(self.previous().line, String::from("Expect parameter name.")));
-      }
-      params.push(param.unwrap());
+      // let param = self.consume(TokenType::Identifier, String::from("Ident"));
+      params.push(self.consume(TokenType::Identifier, String::from("Ident"))?);
       while self.is_match(vec![TokenType::Comma]) {
-          params.push(self.consume(TokenType::Identifier, String::from("Ident")).unwrap())
+          if params.len() > 255{
+            return Err(LoxError { line: self.peek().line, message: String::from("Can't have more than 255 parameters") });
+          }
+          params.push(self.consume(TokenType::Identifier, String::from("Ident"))?)
       }
     }
-    else if self.consume(TokenType::RightParen, String::from(")")).is_err() {
+    if self.consume(TokenType::RightParen, String::from(")")).is_err() {
       return Err(LoxError::error(self.previous().line, String::from("Expect ')' after parameters.")));
     }
     else if self.consume(TokenType::LeftBrace, String::from("{")).is_err(){
