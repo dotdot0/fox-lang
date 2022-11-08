@@ -1,18 +1,25 @@
-#![allow(unused)]
-use crate::ast::{Expr, Stmt};
+use std::borrow::Borrow;
 
-pub struct Interpreter{
-  pub asts: Vec<Stmt>
-}
+use crate::{expr::ExprVisitor, token::Object, ast::{Stmt, Expr}, error::LoxError};
 
+struct Interpreter{}
+  
 impl Interpreter{
-  pub fn new(asts: Vec<Stmt>) -> Self{
-    Self { asts }
+  pub fn new() -> Self{
+    Self {  }
   }
 
-  pub fn interpret(&self){
-    for i in self.asts.iter(){
-      println!("{:#?}", i)
+  fn interpreter(&mut self, statements: &Vec<Box<Stmt>>) -> Result<(), LoxError>{
+    for s in statements{
+      match s.borrow() {
+          Stmt::Expression { value } => {
+            match value {
+                Expr::Literal { value } => 
+            }
+          }
+          _ => todo!()
+      }
     }
+    Ok(())
   }
 }

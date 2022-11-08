@@ -6,8 +6,8 @@ mod error;
 mod ast;
 mod parser;
 mod interpreter;
+mod expr;
 
-use interpreter::Interpreter;
 //use error::LoxError;
 //Imports
 use scanner::Scanner;
@@ -69,8 +69,7 @@ fn run(source: String) {
   let expr = parser.parse();
   
   if expr.is_ok(){
-    let interpreter = Interpreter::new(expr.unwrap());
-    interpreter.interpret()
+    println!("{:#?}", parser.parse().unwrap()) 
   }
   else{
     let error = expr.err().unwrap();

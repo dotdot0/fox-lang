@@ -21,6 +21,11 @@ pub enum Stmt{
     statements: Vec<Box<Stmt>>
   },
 
+  Class{
+    name: Token,
+    methods: Vec<Box<Stmt>>
+  },
+
   If{
     condition: Box<Expr>,
     then_branch: Box<Stmt>,
