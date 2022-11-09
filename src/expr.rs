@@ -15,8 +15,30 @@ pub struct Literal{
   value: Option<Object>
 }
 
-  
+pub struct Grouping{
+    expression: Box<Expr>
+} 
 
+pub struct Variable{
+    name: Token
+}
+
+pub struct Assigment{
+    name: Token,
+    value: Box<Expr>
+}
+
+pub struct Logical{
+    left: Box<Expr>,
+    operator: Token,
+    right: Box<Expr>
+}
+
+pub struct Call{
+    callee: Box<Expr>,
+    paren: Token,
+    arguments: Box<Expr>
+}
 
 
 pub trait ExprVisitor<T> {
