@@ -1,3 +1,4 @@
+#![allow(unused)]
 use crate::{ast::Expr, token::{Token, Object}};
 
 pub struct Binary{
