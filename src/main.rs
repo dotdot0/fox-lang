@@ -7,6 +7,7 @@ mod ast;
 mod parser;
 mod interpreter;
 mod expr;
+mod astprinter;
 
 //use error::LoxError;
 //Imports
@@ -66,13 +67,13 @@ fn run(source: String) {
   let mut scanner: Scanner = Scanner::new(source);
   let tokens = scanner.scan_tokens().unwrap(); 
   let mut parser = Parser::new(tokens.clone());
-  let expr = parser.parse();
+  let stmts = parser.parse();
   
-  if expr.is_ok(){
-    println!("{:#?}", parser.parse().unwrap()) 
+  if stmts.is_ok(){
+    println!("{:#?}", stmts.unwrap()) 
   }
   else{
-    let error = expr.err().unwrap();
+    let error = stmts.err().unwrap();
     error.report(&String::from(""));
   }
 }

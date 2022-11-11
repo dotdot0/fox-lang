@@ -11,6 +11,17 @@ pub enum Object{
     Nil
 }
 
+impl Object{
+    fn value(&self) -> String{
+        match &self {
+            Self::Num(x) => x.to_string(),
+            Self::Str(s) => s.to_owned(),
+            Self::Bool(t) => t.to_string(),
+            Self::Nil => String::from("nil")
+        }
+    }
+}
+
 #[derive(Debug, Clone, PartialEq)]
 pub struct Token{
      pub ttype: TokenType,

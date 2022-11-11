@@ -12,8 +12,7 @@ type ParseError = Result<Expr, LoxError>;
 
 /* 
 program        → declaration* EOF ;
-declaration    → classDecl
-               | funDecl
+declaration    → funDecl
                | varDecl
                | statement ;
 funDecl        → "fun" function ;
@@ -60,54 +59,32 @@ impl Parser{
     let mut statements: Vec<Stmt> = Vec::new();
     while !self.is_at_end() {
         statements.push(self.declaration()?)
+        // println!("{:#?}", self.declaration().unwrap())
     }
     Ok(statements)
   }
 
   fn declaration(&mut self) -> Result<Stmt, LoxError>{
     if self.is_match(vec![TokenType::VAR]){
-      Ok(self.var_declaration()?)
+      self.var_declaration()
     }
     else if self.is_match(vec![TokenType::Fun]){
       self.function("function")
     }
-    else if self.is_match(vec![TokenType::Class]){
-      self.class_declaration()
-    }
     else{
-      Ok(self.statement()?)
+      self.statement()
     }
-  }
-
-  fn class_declaration(&mut self) -> Result<Stmt, LoxError>{
-    let name = self.consume(TokenType::Identifier, String::from("Ident"));
-    if name.is_err(){
-      return Err(LoxError::error(self.previous().line, String::from("Expect class name.")));
-    }
-    if self.consume(TokenType::LeftBrace, String::from("{")).is_err(){
-      return Err(LoxError::error(self.previous().line, String::from("Expect '{' before class body.")));
-    }
-
-    let mut methods: Vec<Box<Stmt>> = Vec::new();
-    while !self.check(TokenType::RightBrace) && !self.is_at_end() {
-        methods.push(Box::new(self.function("method")?));
-    }
-    if self.consume(TokenType::RightBrace, String::from("}")).is_err(){
-      return Err(LoxError::error(self.previous().line, String::from("Expect '}' after class body.")));
-    }
-
-    Ok(Stmt::Class { name: name.unwrap(), methods})
   }
 
   fn statement(&mut self) -> Result<Stmt, LoxError>{
     if self.is_match(vec![TokenType::Print]){
-      return self.print_statement();
+      return Ok(self.print_statement()?);
     }
     else if self.is_match(vec![TokenType::LeftBrace]){
       return Ok(Stmt::Block { statements: self.block()? });
     }
     else if self.is_match(vec![TokenType::If]){
-      return self.if_statement();
+      return Ok(self.if_statement()?);
     }
     else if self.is_match(vec![TokenType::WHILE]){
       return self.while_statement();
