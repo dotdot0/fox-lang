@@ -6,7 +6,7 @@
 - [x] Lexer/Scanner
 - [x] Basic REPL
 - [ ] Error Handling
-- [ ] Parser(WIP)(A recursive descent parser)
+- [x] Parser(WIP)(A recursive descent parser)
 - [ ] Interpreter
 
 
