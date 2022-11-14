@@ -1,7 +1,7 @@
 #![allow(unused)]
 
 
-use crate::{token::Token, ast::{Expr, Stmt}, token_type::{TokenType, self}, token::Object, error::LoxError};
+use crate::{token::Token, ast::{Expr, Stmt}, token_type::{TokenType, self}, token::Object, error::LoxError, expr::{Literal, Assigment, Variable, Logical, Binary, Unary, Call, Grouping}};
 
 pub struct Parser{
   tokens: Vec<Token>,
@@ -164,7 +164,7 @@ impl Parser{
       }
     }
     else {
-      Ok(Stmt::Var { name: self.previous(), initializer: Box::new(Expr::Literal { value: Some(Object::Nil) }) })
+      Ok(Stmt::Var { name: self.previous(), initializer: Box::new(Expr::Literal(Literal{ value: Some(Object::Nil) }))})
     }
   }
 
@@ -237,8 +237,8 @@ impl Parser{
       let value = self.assigment()?;
 
       match expr {
-          Expr::Variable { name } => {
-            return Ok(Expr::Assigment { name, value: Box::new(value) })
+          Expr::Variable(Variable{ name }) => {
+            return Ok(Expr::Assigment(Assigment{ name, value: Box::new(value) }));
           },
           _ => {
             return Err(LoxError::error(self.previous().line, String::from("Invalid assigment target.")))}
@@ -254,7 +254,7 @@ impl Parser{
     while self.is_match(vec![TokenType::Or]) {
       let operator = self.previous();
       let right = self.and()?;
-      expr = Expr::Logical { left: Box::new(expr), operator, right: Box::new(right) }
+      expr = Expr::Logical(Logical{ left: Box::new(expr), operator, right: Box::new(right) })
     }
     Ok(expr)
   }
@@ -265,7 +265,7 @@ impl Parser{
     while self.is_match(vec![TokenType::And]) {
       let operator = self.previous();
       let right = self.equality()?;
-      expr = Expr::Logical { left: Box::new(expr), operator, right: Box::new(right) }  
+      expr = Expr::Logical(Logical{ left: Box::new(expr), operator, right: Box::new(right) })
     }
     Ok(expr)
   }
@@ -276,7 +276,7 @@ impl Parser{
     while self.is_match(vec![TokenType::Bang_Equal, TokenType::Equal_Equal]){
       let operator = self.previous();
       let right = self.comparison()?;
-      expr = Expr::Binary { left: Box::new(expr), operator, right: Box::new(right) }
+      expr = Expr::Binary(Binary{ left: Box::new(expr), operator, right: Box::new(right) })
     }
     Ok(expr)
   }
@@ -287,7 +287,7 @@ impl Parser{
     while self.is_match(vec![TokenType::Greater_Equal, TokenType::Greater, TokenType::Less_Equal, TokenType::Less]) {
         let operator = self.previous();
         let right = self.term()?;
-        expr = Expr::Binary { left: Box::new(expr), operator, right: Box::new(right) }
+        expr = Expr::Binary(Binary{ left: Box::new(expr), operator, right: Box::new(right) })
     }
     Ok(expr)
   }
@@ -298,7 +298,7 @@ impl Parser{
     while self.is_match(vec![TokenType::Minus, TokenType::Plus]) {
         let operator = self.previous();
         let right = self.factor()?;
-        expr = Expr::Binary { left: Box::new(expr), operator, right: Box::new(right) }
+        expr = Expr::Binary(Binary{ left: Box::new(expr), operator, right: Box::new(right) })
     }
     Ok(expr)
   }
@@ -309,7 +309,7 @@ impl Parser{
     while self.is_match(vec![TokenType::Slash, TokenType::Star]) {
         let operator = self.previous();
         let right = self.unary()?;
-        expr = Expr::Binary { left: Box::new(expr), operator, right: Box::new(right) }
+        expr = Expr::Binary(Binary{ left: Box::new(expr), operator, right: Box::new(right) })
     }
     Ok(expr)
   }
@@ -318,7 +318,7 @@ impl Parser{
     if self.is_match(vec![TokenType::Minus, TokenType::Bang]){
       let operator = self.previous();
       let expr = self.unary()?;
-      return Ok(Expr::Unary { operator, right: Box::new(expr) });
+      return Ok(Expr::Unary(Unary{operator, right: Box::new(expr) }));
     }
     self.call()
   }
@@ -341,7 +341,7 @@ impl Parser{
       return Err(LoxError::error(self.previous().line, String::from("Expect ')' after arguments.")));
     }
 
-    Ok(Expr::Call { callee: Box::new(callee), paren: paren.unwrap(), arguments })
+    Ok(Expr::Call(Call{ callee: Box::new(callee), paren: paren.unwrap(), arguments }))
   }
 
   fn call(&mut self) -> ParseError{
@@ -359,19 +359,19 @@ impl Parser{
 
   fn primary(&mut self) -> ParseError{
     if self.is_match(vec![TokenType::False]) { 
-       Ok(Expr::Literal { value: Some(Object::Bool(false)) })
+       Ok(Expr::Literal(Literal{ value: Some(Object::Bool(false)) }))
     }
 
     else if self.is_match(vec![TokenType::True]){
-       Ok( Expr::Literal { value: Some(Object::Bool(true)) })
+       Ok(Expr::Literal(Literal{ value: Some(Object::Bool(true)) }))
     }
 
     else if self.is_match(vec![TokenType::Nil]){
-       Ok(Expr::Literal { value: Some(Object::Nil) })
+       Ok(Expr::Literal(Literal{ value: Some(Object::Nil) }))
     }
 
     else if self.is_match(vec![TokenType::STRING, TokenType::Number]){
-       Ok(Expr::Literal { value: self.previous().literal })
+       Ok(Expr::Literal(Literal{ value: self.previous().literal }))
     }
 
     else if self.is_match(vec![TokenType::LeftParen]){
@@ -381,13 +381,13 @@ impl Parser{
         Err(LoxError::error(self.previous().line, String::from("Expect ) after expression.")))
       }
       else{
-        Ok(Expr::Grouping { expression: Box::new(expr) })
+        Ok(Expr::Grouping(Grouping{ expression: Box::new(expr) }))
       }
     }else if self.is_match(vec![TokenType::Identifier]){
-      Ok(Expr::Variable { name: self.previous() })
+      Ok(Expr::Variable(Variable{ name: self.previous() }))
     }
     else {
-        Ok(Expr::Literal { value: None })
+        Ok(Expr::Literal(Literal{ value: None }))
     }
   }
 

@@ -1,5 +1,5 @@
 #![allow(dead_code, unused)]
-//use crate::expr::{ExprVisitor, Binary, Unary, Literal, Grouping, Variable, Assigment, Logical, Call};
+use crate::expr::{ExprVisitor, Binary, Unary, Literal, Grouping, Variable, Assigment, Logical, Call};
 use crate::token_type::TokenType;
 use crate::token::{Object, Token};
 
@@ -54,44 +54,20 @@ pub enum Stmt{
 #[derive(Clone, PartialEq, Debug)]
 pub enum Expr{
   
-  Binary{
-    left: Box<Expr>,
-    operator: Token,
-    right: Box<Expr>
-  },
+  Binary(Binary),
 
-  Unary{
-    operator: Token,
-    right: Box<Expr>
-  },
+  Unary(Unary),
 
-  Literal{
-    value: Option<Object>
-  },
+  Literal(Literal),
 
-  Grouping{
-    expression: Box<Expr>
-  },
+  Grouping(Grouping),
 
-  Variable{
-    name: Token
-  },
+  Variable(Variable),
 
-  Assigment{
-    name: Token,
-    value: Box<Expr>
-  },
+  Assigment(Assigment),
 
-  Logical{
-    left: Box<Expr>,
-    operator: Token,
-    right: Box<Expr>
-  },
+  Logical(Logical),
 
-  Call{
-    callee: Box<Expr>,
-    paren: Token,
-    arguments: Vec<Box<Expr>>
-  }
+  Call(Call)
 
 }
