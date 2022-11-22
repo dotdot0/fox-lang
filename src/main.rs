@@ -8,6 +8,7 @@ mod parser;
 mod interpreter;
 mod expr;
 mod astprinter;
+mod stmt;
 
 //use error::LoxError;
 //Imports
