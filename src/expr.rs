@@ -50,33 +50,8 @@ pub struct Call{
 }
 
 
-pub trait ExprVisitor<T> {
-    fn visit_literal_expr(&self, expr: &Literal) -> T;
-    fn visit_grouping_expr(&self, expr: &Grouping) -> T;
-    fn visit_unary_expr(&self, expr: &Unary) -> T;
-    fn visit_binary_expr(&self, expr: &Binary) -> T;
-}
-
-impl Binary{
-  fn accept<T>(&self, visitor: &dyn ExprVisitor<T>) -> T{
-    visitor.visit_binary_expr(self)
-  }
-}
-
 impl Literal{
-  fn accept<T>(&self, visitor: &dyn ExprVisitor<T>) -> T{
-    visitor.visit_literal_expr(self)
-  }
-}
-
-impl Grouping{
-  fn accept<T>(&self, visitor: &dyn ExprVisitor<T>) -> T{
-    visitor.visit_grouping_expr(self)
-  }
-}
-
-impl Unary{
-  fn accept<T>(&self, visitor: &dyn ExprVisitor<T>) -> T{
-    visitor.visit_unary_expr(self)
+  pub fn interpret(&mut self) -> String{
+    self.value.as_ref().unwrap().value()
   }
 }

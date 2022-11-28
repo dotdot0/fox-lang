@@ -1,5 +1,5 @@
 #![allow(dead_code, unused)]
-use crate::expr::{ExprVisitor, Binary, Unary, Literal, Grouping, Variable, Assigment, Logical, Call};
+use crate::expr::{Binary, Unary, Literal, Grouping, Variable, Assigment, Logical, Call};
 use crate::stmt::{Print, Expression, Var, Block, If, While, Function, Return};
 use crate::token_type::TokenType;
 use crate::token::{Object, Token};

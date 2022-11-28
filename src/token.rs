@@ -12,7 +12,7 @@ pub enum Object{
 }
 
 impl Object{
-    fn value(&self) -> String{
+    pub fn value(&self) -> String{
         match &self {
             Self::Num(x) => x.to_string(),
             Self::Str(s) => s.to_owned(),
