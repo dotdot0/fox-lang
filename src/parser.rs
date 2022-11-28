@@ -15,7 +15,7 @@ program        → declaration* EOF ;
 declaration    → funDecl
                | varDecl
                | statement ;
-funDecl        → "fun" function ;
+funDecl        → "fn" function ;
 function       → IDENTIFIER "(" parameters? ")" block ;
 statement      → exprStmt
                | ifStmt
@@ -128,6 +128,7 @@ impl Parser{
   }
 
   fn print_statement(&mut self) -> Result<Stmt, LoxError>{
+    //value can be any of the valid expression
     let value = self.expression()?;
     if self.consume(TokenType::Semicolon, String::from("Expect ; after the value")).is_err(){
       Err(LoxError::error(self.previous().line, String::from("Expect ; after the expression")))
@@ -149,13 +150,21 @@ impl Parser{
     Ok(Stmt::Return(Return{ keyword, value: Box::new(value.unwrap()) }))
   }
 
+  //Parse Variable decl statement
   fn var_declaration(&mut self) -> Result<Stmt, LoxError>{
     let mut initializer: Option<Expr> = None;
-    let name = self.consume(TokenType::Identifier, String::from("Expect variable name."));
+    let name = self.consume(TokenType::Identifier, String::from("var name"));
+    
+    //Check if a ident in provided
     if name.is_err(){
       Err(LoxError::error(self.previous().line, String::from("Expect variable name.")))
     }
+
     else if self.is_match(vec![TokenType::Equal]){
+      //Check if a value is provided after the '='
+      if self.is_match(vec![TokenType::Semicolon]){
+        return Err(LoxError::error(self.previous().line, "Expect a value after '='.".to_owned()));
+      }
       initializer = Some(self.expression()?);
       if self.consume(TokenType::Semicolon, String::from("Expect ';' after variable declaration.")).is_err(){
         return Err(LoxError::error(self.previous().line, String::from("Expect ';' after variable declaration")));
@@ -163,6 +172,8 @@ impl Parser{
         return Ok(Stmt::Var(Var{ name: name.unwrap(), initializer: Box::new(initializer.unwrap()) }));
       }
     }
+
+    //If '=' not found treat the value ad nil
     else {
       Ok(Stmt::Var(Var{ name: self.previous(), initializer: Box::new(Expr::Literal(Literal{ value: Some(Object::Nil) }))}))
     }
@@ -198,6 +209,8 @@ impl Parser{
 
   fn function(&mut self, kind: &str) -> Result<Stmt, LoxError>{
     let name = self.consume(TokenType::Identifier, String::from("Ident"));
+
+    //Check if function name is provided
     if name.is_err(){
       return Err(LoxError::error(self.previous().line, String::from(format!("Expect {kind} name."))));
     }
@@ -206,7 +219,8 @@ impl Parser{
     }
     let mut params: Vec<Token> = Vec::new();
     if !self.check(TokenType::RightParen){
-      // let param = self.consume(TokenType::Identifier, String::from("Ident"));
+      
+      //First consume the first argument then enter the loop of ','
       params.push(self.consume(TokenType::Identifier, String::from("Ident"))?);
       while self.is_match(vec![TokenType::Comma]) {
           if params.len() > 255{
@@ -325,9 +339,12 @@ impl Parser{
 
   fn finish_call(&mut self, callee: Expr) -> ParseError{
     let mut arguments: Vec<Box<Expr>> = Vec::new();
-    
+   
+    //Until we don't reach a ')' keep adding arguments 
     if !self.check(TokenType::RightParen){
       arguments.push(Box::new(self.expression()?));
+      
+      //Loop gonna run until it finds ',' as the next token
       while self.is_match(vec![TokenType::Comma]) {
           if arguments.len() >= 255{
             return Err(LoxError::error(self.previous().line, String::from("Can't have more than 255 arguments.")));
@@ -344,6 +361,7 @@ impl Parser{
     Ok(Expr::Call(Call{ callee: Box::new(callee), paren: paren.unwrap(), arguments }))
   }
 
+  //Cause function call starts with a indent so it's high in precedence
   fn call(&mut self) -> ParseError{
     let mut expr = self.primary()?;
 
