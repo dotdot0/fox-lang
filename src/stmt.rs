@@ -19,7 +19,7 @@ pub struct Var{
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Block{
-  pub statements: Vec<Box<Expr>>
+  pub statements: Vec<Box<Stmt>>
 }
 
 #[derive(Debug, Clone, PartialEq)]

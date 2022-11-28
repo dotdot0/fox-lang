@@ -1,53 +1,26 @@
 #![allow(dead_code, unused)]
 use crate::expr::{ExprVisitor, Binary, Unary, Literal, Grouping, Variable, Assigment, Logical, Call};
+use crate::stmt::{Print, Expression, Var, Block, If, While, Function, Return};
 use crate::token_type::TokenType;
 use crate::token::{Object, Token};
 
 #[derive(Debug, PartialEq, Clone)]
 pub enum Stmt{
-  Print{
-    value: Box<Expr>
-  },
+  Print(Print),
 
-  Expression{
-    value: Box<Expr>
-  },
+  Expression(Expression),
 
-  Var{
-    name: Token,
-    initializer: Box<Expr>
-  },
+  Var(Var),
 
-  Block{
-    statements: Vec<Box<Stmt>>
-  },
+  Block(Block),
 
-  Class{
-    name: Token,
-    methods: Vec<Box<Stmt>>
-  },
+  If(If),
 
-  If{
-    condition: Box<Expr>,
-    then_branch: Box<Stmt>,
-    else_branch: Box<Option<Stmt>>
-  },
+  While(While),
 
-  While{
-    condition: Box<Expr>,
-    body: Box<Stmt>
-  },
+  Function(Function),
 
-  Function{
-    name: Token,
-    params: Vec<Token>,
-    body: Vec<Box<Stmt>>
-  },
-
-  Return{
-    keyword: Token,
-    value: Box<Expr>
-  }
+  Return(Return)
 }
 
 

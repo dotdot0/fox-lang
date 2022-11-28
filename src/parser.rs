@@ -1,7 +1,7 @@
 #![allow(unused)]
 
 
-use crate::{token::Token, ast::{Expr, Stmt}, token_type::{TokenType, self}, token::Object, error::LoxError, expr::{Literal, Assigment, Variable, Logical, Binary, Unary, Call, Grouping}};
+use crate::{token::Token, ast::{Expr, Stmt}, token_type::{TokenType, self}, token::Object, error::LoxError, expr::{Literal, Assigment, Variable, Logical, Binary, Unary, Call, Grouping}, stmt::{Block, If, Print, Return, Var, While, Expression, Function}};
 
 pub struct Parser{
   tokens: Vec<Token>,
@@ -81,7 +81,7 @@ impl Parser{
       return Ok(self.print_statement()?);
     }
     else if self.is_match(vec![TokenType::LeftBrace]){
-      return Ok(Stmt::Block { statements: self.block()? });
+      return Ok(Stmt::Block(Block{ statements: self.block()? }));
     }
     else if self.is_match(vec![TokenType::If]){
       return Ok(self.if_statement()?);
@@ -111,7 +111,7 @@ impl Parser{
     if self.is_match(vec![TokenType::Else]){
       else_branch = Some(self.statement()?)
     }
-    Ok(Stmt::If { condition: Box::new(condition.unwrap()), then_branch: Box::new(then_branch), else_branch: Box::new(else_branch) })
+    Ok(Stmt::If(If{ condition: Box::new(condition.unwrap()), then_branch: Box::new(then_branch), else_branch: Box::new(else_branch) }))
   }
 
   fn block(&mut self) -> Result<Vec<Box<Stmt>>, LoxError>{
@@ -132,7 +132,7 @@ impl Parser{
     if self.consume(TokenType::Semicolon, String::from("Expect ; after the value")).is_err(){
       Err(LoxError::error(self.previous().line, String::from("Expect ; after the expression")))
     }else{
-      Ok(Stmt::Print { value: Box::new(value) })
+      Ok(Stmt::Print(Print{ value: Box::new(value) }))
     }
   }
 
@@ -146,7 +146,7 @@ impl Parser{
     if self.consume(TokenType::Semicolon, String::from(";")).is_err(){
       return Err(LoxError::error(self.previous().line, String::from("Expect ';' after return statement.")));
     }
-    Ok(Stmt::Return { keyword, value: Box::new(value.unwrap()) })
+    Ok(Stmt::Return(Return{ keyword, value: Box::new(value.unwrap()) }))
   }
 
   fn var_declaration(&mut self) -> Result<Stmt, LoxError>{
@@ -160,11 +160,11 @@ impl Parser{
       if self.consume(TokenType::Semicolon, String::from("Expect ';' after variable declaration.")).is_err(){
         return Err(LoxError::error(self.previous().line, String::from("Expect ';' after variable declaration")));
       }else{
-        return Ok(Stmt::Var { name: name.unwrap(), initializer: Box::new(initializer.unwrap()) });
+        return Ok(Stmt::Var(Var{ name: name.unwrap(), initializer: Box::new(initializer.unwrap()) }));
       }
     }
     else {
-      Ok(Stmt::Var { name: self.previous(), initializer: Box::new(Expr::Literal(Literal{ value: Some(Object::Nil) }))})
+      Ok(Stmt::Var(Var{ name: self.previous(), initializer: Box::new(Expr::Literal(Literal{ value: Some(Object::Nil) }))}))
     }
   }
 
@@ -183,7 +183,7 @@ impl Parser{
     else{
       stmt = Some(self.statement()?);
     }
-    Ok(Stmt::While { condition: Box::new(expr.unwrap()), body: Box::new(stmt.unwrap()) })
+    Ok(Stmt::While(While{ condition: Box::new(expr.unwrap()), body: Box::new(stmt.unwrap()) }))
   }
 
   fn expression_statement(&mut self) -> Result<Stmt, LoxError>{
@@ -192,7 +192,7 @@ impl Parser{
       Err(LoxError::error(self.previous().line, String::from("Expect ; after the expression")))
     }
     else{
-      Ok(Stmt::Expression { value: Box::new(value) })
+      Ok(Stmt::Expression(Expression{ value: Box::new(value) }))
     }
   }
 
@@ -222,7 +222,7 @@ impl Parser{
       return Err(LoxError::error(self.previous().line, String::from(format!("Expect before {kind} body."))));
     }
     let body: Vec<Box<Stmt>> = self.block()?;
-    Ok(Stmt::Function { name: name.unwrap(), params, body })
+    Ok(Stmt::Function(Function{ name: name.unwrap(), params, body }))
   }
 
   fn expression(&mut self) -> ParseError{
