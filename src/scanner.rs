@@ -134,7 +134,7 @@ impl Scanner{
             }
             else{
             
-                return Err(LoxError::error(self.line, "Unexpected Character".to_owned()));
+                return Err(LoxError::error(self.line, self.current, "Unexpected Character".to_owned()));
             }
 
 
@@ -199,7 +199,7 @@ impl Scanner{
         }
 
         if self.is_at_end(){
-            Err(LoxError::error(self.line, "Unterminated string.".to_owned()))
+            Err(LoxError::error(self.line, self.current, "Unterminated string.".to_owned()))
         }
         else{
             self.advance();
@@ -229,13 +229,13 @@ impl Scanner{
             self.advance();
         }
         let ident:&str = self.source[self.start..self.current].as_ref();
-         let tok = self.reserved_keyword(ident);
+         let (ttype, literal) = self.reserved_keyword(ident);
          //if reserved_keyword.contains_key(ident){
         //     reserved_keyword.get(&ident).unwrap()
         // }else{
         //     &TokenType::Identifier
         // };
-        self.add_token_object(tok.0, tok.1)
+        self.add_token_object(ttype, literal)
     }
     
     //Checks if the provided identifier is reserved keyword

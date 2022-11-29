@@ -98,12 +98,12 @@ impl Parser{
   fn if_statement(&mut self) -> Result<Stmt, LoxError>{
     let mut condition: Option<Expr> = None;
     if self.consume(TokenType::LeftParen, String::from("(")).is_err(){
-      return Err(LoxError::error(self.previous().line, String::from("Expect '(' after 'if'.")));
+      return Err(LoxError::error(self.previous().line, self.current, String::from("Expect '(' after 'if'.")));
     }
     else{
       condition = Some(self.expression()?);
       if !self.consume(TokenType::RightParen, String::from("Expect ')' after if condition.")).is_ok(){
-        return Err(LoxError::error(self.previous().line, String::from("Expect ')' after if condition.")));
+        return Err(LoxError::error(self.previous().line, self.current, String::from("Expect ')' after if condition.")));
       }
     }
     let then_branch = self.statement()?;
@@ -122,7 +122,7 @@ impl Parser{
     }
 
     if self.consume(TokenType::RightBrace, String::from("}")).is_err(){
-      return Err(LoxError::error(self.previous().line, String::from("Expect '}' after block.")));
+      return Err(LoxError::error(self.previous().line, self.current,String::from("Expect '}' after block.")));
     }
     Ok(statements)
   }
@@ -131,7 +131,7 @@ impl Parser{
     //value can be any of the valid expression
     let value = self.expression()?;
     if self.consume(TokenType::Semicolon, String::from("Expect ; after the value")).is_err(){
-      Err(LoxError::error(self.previous().line, String::from("Expect ; after the expression")))
+      Err(LoxError::error(self.previous().line, self.current,String::from("Expect ; after the expression")))
     }else{
       Ok(Stmt::Print(Print{ value: Box::new(value) }))
     }
@@ -145,7 +145,7 @@ impl Parser{
     }
 
     if self.consume(TokenType::Semicolon, String::from(";")).is_err(){
-      return Err(LoxError::error(self.previous().line, String::from("Expect ';' after return statement.")));
+      return Err(LoxError::error(self.previous().line, self.current,String::from("Expect ';' after return statement.")));
     }
     Ok(Stmt::Return(Return{ keyword, value: Box::new(value.unwrap()) }))
   }
@@ -157,17 +157,17 @@ impl Parser{
     
     //Check if a ident in provided
     if name.is_err(){
-      Err(LoxError::error(self.previous().line, String::from("Expect variable name.")))
+      Err(LoxError::error(self.previous().line, self.current, String::from("Expect variable name.")))
     }
 
     else if self.is_match(vec![TokenType::Equal]){
       //Check if a value is provided after the '='
       if self.is_match(vec![TokenType::Semicolon]){
-        return Err(LoxError::error(self.previous().line, "Expect a value after '='.".to_owned()));
+        return Err(LoxError::error(self.previous().line, self.current, "Expect a value after '='.".to_owned()));
       }
       initializer = Some(self.expression()?);
       if self.consume(TokenType::Semicolon, String::from("Expect ';' after variable declaration.")).is_err(){
-        return Err(LoxError::error(self.previous().line, String::from("Expect ';' after variable declaration")));
+        return Err(LoxError::error(self.previous().line, self.current, String::from("Expect ';' after variable declaration")));
       }else{
         return Ok(Stmt::Var(Var{ name: name.unwrap(), initializer: Box::new(initializer.unwrap()) }));
       }
@@ -183,13 +183,13 @@ impl Parser{
     let mut expr: Option<Expr> = None;
     let mut stmt: Option<Stmt> = None;
     if self.consume(TokenType::LeftParen, String::from("(")).is_err(){
-      return Err(LoxError::error(self.previous().line, String::from("Expect '(' after 'while'.")));
+      return Err(LoxError::error(self.previous().line, self.current, String::from("Expect '(' after 'while'.")));
     }
     else{
       expr = Some(self.expression()?);
     }
     if self.consume(TokenType::RightParen, String::from(")")).is_err(){
-      return Err(LoxError::error(self.previous().line, String::from("Expect ')' after condition.")));
+      return Err(LoxError::error(self.previous().line, self.current, String::from("Expect ')' after condition.")));
     }
     else{
       stmt = Some(self.statement()?);
@@ -200,7 +200,7 @@ impl Parser{
   fn expression_statement(&mut self) -> Result<Stmt, LoxError>{
     let value = self.expression()?;
     if self.consume(TokenType::Semicolon, String::from("Expect ; after the value")).is_err(){
-      Err(LoxError::error(self.previous().line, String::from("Expect ; after the expression")))
+      Err(LoxError::error(self.previous().line, self.current, String::from("Expect ; after the expression")))
     }
     else{
       Ok(Stmt::Expression(Expression{ value: Box::new(value) }))
@@ -212,10 +212,10 @@ impl Parser{
 
     //Check if function name is provided
     if name.is_err(){
-      return Err(LoxError::error(self.previous().line, String::from(format!("Expect {kind} name."))));
+      return Err(LoxError::error(self.previous().line, self.current, String::from(format!("Expect {kind} name."))));
     }
     else if self.consume(TokenType::LeftParen, String::from("(")).is_err(){
-      return Err(LoxError::error(self.previous().line, String::from(format!("Expect '(' after {kind} name."))));
+      return Err(LoxError::error(self.previous().line, self.current, String::from(format!("Expect '(' after {kind} name."))));
     }
     let mut params: Vec<Token> = Vec::new();
     if !self.check(TokenType::RightParen){
@@ -225,20 +225,20 @@ impl Parser{
       while self.is_match(vec![TokenType::Comma]) {
         if self.check(TokenType::Identifier){
           if params.len() > 255{
-            return Err(LoxError { line: self.peek().line, message: String::from("Can't have more than 255 parameters") });
+            return Err(LoxError { line: self.peek().line, column: self.current, message: String::from("Can't have more than 255 parameters") });
           }
           params.push(self.consume(TokenType::Identifier, String::from("Ident"))?)
       
           }else{
-            return Err(LoxError::error(self.previous().line, "Expected a param after ','".to_string()));
+            return Err(LoxError::error(self.previous().line, self.current, "Expected a param after ','".to_string()));
           }  
         }
     }
     if self.consume(TokenType::RightParen, String::from(")")).is_err() {
-      return Err(LoxError::error(self.previous().line, String::from("Expect ')' after parameters.")));
+      return Err(LoxError::error(self.previous().line, self.current, String::from("Expect ')' after parameters.")));
     }
     else if self.consume(TokenType::LeftBrace, String::from("{")).is_err(){
-      return Err(LoxError::error(self.previous().line, String::from(format!("Expect before {kind} body."))));
+      return Err(LoxError::error(self.previous().line, self.current, String::from(format!("Expect before {kind} body."))));
     }
     let body: Vec<Box<Stmt>> = self.block()?;
     Ok(Stmt::Function(Function{ name: name.unwrap(), params, body }))
@@ -260,7 +260,7 @@ impl Parser{
             return Ok(Expr::Assigment(Assigment{ name, value: Box::new(value) }));
           },
           _ => {
-            return Err(LoxError::error(self.previous().line, String::from("Invalid assigment target.")))}
+            return Err(LoxError::error(self.previous().line, self.current, String::from("Invalid assigment target.")))}
       }
     }
 
@@ -352,7 +352,7 @@ impl Parser{
       //Loop gonna run until it finds ',' as the next token
       while self.is_match(vec![TokenType::Comma]) {
           if arguments.len() >= 255{
-            return Err(LoxError::error(self.previous().line, String::from("Can't have more than 255 arguments.")));
+            return Err(LoxError::error(self.previous().line, self.current, String::from("Can't have more than 255 arguments.")));
           }
           arguments.push(Box::new(self.expression()?))
       }
@@ -360,7 +360,7 @@ impl Parser{
 
     let paren = self.consume(TokenType::RightParen, String::from(")"));
     if paren.is_err(){
-      return Err(LoxError::error(self.previous().line, String::from("Expect ')' after arguments.")));
+      return Err(LoxError::error(self.previous().line, self.current, String::from("Expect ')' after arguments.")));
     }
 
     Ok(Expr::Call(Call{ callee: Box::new(callee), paren: paren.unwrap(), arguments }))
@@ -401,7 +401,7 @@ impl Parser{
       let mut expr = self.expression()?;
 
       if self.consume(TokenType::RightParen, String::from("Expect ) after expression.")).is_err(){
-        Err(LoxError::error(self.previous().line, String::from("Expect ) after expression.")))
+        Err(LoxError::error(self.previous().line, self.current, String::from("Expect ) after expression.")))
       }
       else{
         Ok(Expr::Grouping(Grouping{ expression: Box::new(expr) }))
@@ -430,7 +430,7 @@ impl Parser{
       Ok(self.advance())
     }
     else {
-      Err(LoxError::error(self.previous().line, String::from("Expect ) at the end ")))
+      Err(LoxError::error(self.previous().line, self.current, String::from("Expect ) at the end ")))
     }
   }
 
