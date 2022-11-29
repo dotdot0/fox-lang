@@ -223,11 +223,16 @@ impl Parser{
       //First consume the first argument then enter the loop of ','
       params.push(self.consume(TokenType::Identifier, String::from("Ident"))?);
       while self.is_match(vec![TokenType::Comma]) {
+        if self.check(TokenType::Identifier){
           if params.len() > 255{
             return Err(LoxError { line: self.peek().line, message: String::from("Can't have more than 255 parameters") });
           }
           params.push(self.consume(TokenType::Identifier, String::from("Ident"))?)
-      }
+      
+          }else{
+            return Err(LoxError::error(self.previous().line, "Expected a param after ','".to_string()));
+          }  
+        }
     }
     if self.consume(TokenType::RightParen, String::from(")")).is_err() {
       return Err(LoxError::error(self.previous().line, String::from("Expect ')' after parameters.")));
