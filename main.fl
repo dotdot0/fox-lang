@@ -1,5 +1,1 @@
-fn sayHi(first, last) {
-  return first + last;
-}
-
-let name = sayHi("Dear", "Reader");
+true;

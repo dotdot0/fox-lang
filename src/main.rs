@@ -69,9 +69,8 @@ fn run(source: String) {
   let tokens = scanner.scan_tokens().unwrap(); 
   let mut parser = Parser::new(tokens.clone());
   let stmts = parser.parse();
-  
   if stmts.is_ok(){
-    println!("{:#?}", stmts.unwrap()) 
+    println!("{:#?}", stmts); 
   }
   else{
     let error = stmts.err().unwrap();

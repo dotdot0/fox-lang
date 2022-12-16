@@ -49,9 +49,3 @@ pub struct Call{
     pub arguments: Vec<Box<Expr>>
 }
 
-
-impl Literal{
-  pub fn interpret(&mut self) -> String{
-    self.value.as_ref().unwrap().value()
-  }
-}
