@@ -1,6 +1,6 @@
 # fox-lang
 
-### A programming language written in rust
+### A interpreter written in rust
 
 ## Progress
 - [x] Lexer/Scanner
