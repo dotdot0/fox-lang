@@ -1,13 +1,14 @@
 # fox-lang
 
-### A tree walk interpreter written in rust
+### A programming language written in rust
 
 ## Progress
 - [x] Lexer/Scanner
 - [x] Basic REPL
 - [ ] Error Handling
 - [x] Parser(WIP)(A recursive descent parser)
-- [ ] Interpreter
+- [ ] ByteCode Compiler
+- [ ] Virtual Machine
 
 
 Have any suggestion feel free to open a issue.

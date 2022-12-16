@@ -9,6 +9,7 @@ mod interpreter;
 mod expr;
 mod astprinter;
 mod stmt;
+pub mod vm;
 
 //use error::LoxError;
 //Imports
@@ -19,18 +20,21 @@ use std::io::{self, Write, Read};
 use std::fs::File;
 
 fn main() {
-    let args: Vec<String> = args().collect();
 
-    if args.len() > 2{
-      println!("Usage: rlox [script]");
-      std::process::exit(64)
-    }
-    else if args.len() == 2{
-      run_file(&args[1])
-    }
-    else{
-      run_prompt()
-    }
+  // let mut chunk = vm::chunk::Chunk::new();
+  // chunk.write_chunk(vm::chunk::OpCode::OP_RETURN);
+    // let args: Vec<String> = args().collect();
+
+    // if args.len() > 2{
+    //   println!("Usage: rlox [script]");
+    //   std::process::exit(64)
+    // }
+    // else if args.len() == 2{
+    //   run_file(&args[1])
+    // }
+    // else{
+    //   run_prompt()
+    // }
 }
 
 fn run_file(file: &String){ 
