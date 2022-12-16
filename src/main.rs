@@ -1,3 +1,4 @@
+#![allow(unused)]
 //Modules
 mod token_type;
 mod token;
@@ -21,8 +22,14 @@ use std::fs::File;
 
 fn main() {
 
-  // let mut chunk = vm::chunk::Chunk::new();
-  // chunk.write_chunk(vm::chunk::OpCode::OP_RETURN);
+  let mut chunk = vm::chunk::Chunk::new();
+  chunk.add_constant(1.2);
+
+  chunk.write_chunk(vm::chunk::Operation::Constant);
+
+  chunk.write_chunk(vm::chunk::Operation::Return);
+  chunk.disassemble_chunk("test chunk");
+  
     // let args: Vec<String> = args().collect();
 
     // if args.len() > 2{
