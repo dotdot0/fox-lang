@@ -1,0 +1,18 @@
+
+use crate::vm::chunk::{Chunk, Operation, u8_to_operation};
+
+pub fn disassemble_chunk(chunk: &Chunk){
+    println!("==BYTECODE==");
+
+    let mut offset: usize = 0;
+
+    while offset < chunk.code.len(){
+
+    }
+}
+
+fn disassemble_instruction(chunk: &Chunk, offset: usize) -> usize{ 
+    print!("{:#04}", offset);
+    let instruction: Operation = u8_to_operation(chunk.code[offset]); 
+    offset + 1 
+}

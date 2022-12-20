@@ -1,15 +1,19 @@
 #![allow(unused)]
 
+use std::fmt::{self, write};
+use std::convert::From;
+
 type Value = f32;
 
-#[derive(Debug, Clone, Copy)]
+#[repr(u8)]
 pub enum Operation{
-    Return,
-    Constant
+    Return = 0,
+    Constant = 1
 }
 
+
 pub struct Chunk{
-    code: Vec<Operation>,
+    pub code: Vec<u8>,
     /*
     A way to store const that will result in a value at runtime
     1 + 2; -> 3[But at runtime] Interpreter needs to store 1, 2
@@ -19,7 +23,7 @@ pub struct Chunk{
 }
 
 impl Chunk{
-    pub fn new() -> Self{
+    pub fn init() -> Self{
         Self{
             code: vec![],
             constants: vec![]
@@ -27,7 +31,7 @@ impl Chunk{
     }
 
     pub fn write_chunk(&mut self, op: Operation){
-        self.code.push(op);
+        self.code.push(op as u8);
     }
 
     pub fn add_constant(&mut self, value: Value) -> i32{
@@ -35,38 +39,18 @@ impl Chunk{
         get_index(&self.constants, value)
     }
 
-    pub fn disassemble_chunk(&self, name: &str){
-
-        let mut offset = 0;
-
-        println!("== {name} ==");
-
-        self.code.iter().for_each(|c| {
-            offset = self.disassemble_instruction(offset);
-        })
-    }
-
-    fn disassemble_instruction(&self, offset: i32) -> i32{
-        print!("{:#04} ", offset);
-
-        let instruction = self.code[offset as usize];
-        
-        match instruction {
-            Operation::Return => return self.simple_instruction("RETURN", offset),
-            _ => println!("Invalid Chunk")
-        }
-
-        offset + 1
-    }
-
-    fn simple_instruction(&self, name: &str, offset: i32) -> i32{
-        print!("{name}");
-        offset + 1
-    }
 }
 
 
 fn get_index<T: PartialEq>(vec: &Vec<T>, x: T) -> i32{
     let index = vec.iter().position(|element| element == &x).unwrap();
     index as i32
+}
+
+pub fn u8_to_operation(byte_code: u8) -> Operation{
+    match byte_code{
+        0 => Operation::Return,
+        1 => Operation::Constant,
+        _ => todo!()
+    }
 }

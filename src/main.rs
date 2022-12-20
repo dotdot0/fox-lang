@@ -19,17 +19,21 @@ use parser::Parser;
 use std::env::args;
 use std::io::{self, Write, Read};
 use std::fs::File;
+use crate::vm::debug::disassemble_chunk;
 
 fn main() {
 
-  let mut chunk = vm::chunk::Chunk::new();
+  let mut chunk = vm::chunk::Chunk::init();
   chunk.add_constant(1.2);
 
-  chunk.write_chunk(vm::chunk::Operation::Constant);
+  let string = String::new();
+
+  // chunk.write_chunk(vm::chunk::Operation::Constant);
 
   chunk.write_chunk(vm::chunk::Operation::Return);
-  chunk.disassemble_chunk("test chunk");
-  
+  disassemble_chunk(&chunk);
+
+   
     // let args: Vec<String> = args().collect();
 
     // if args.len() > 2{
