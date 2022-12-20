@@ -1,4 +1,4 @@
-use crate::vm::chunk::{Chunk, Operation, u8_to_operation};
+use crate::vm::chunk::{Chunk, Operation, u8_to_operation, Value};
 
 pub fn disassemble_chunk(chunk: &Chunk){
     println!("==BYTECODE==");
@@ -8,6 +8,8 @@ pub fn disassemble_chunk(chunk: &Chunk){
     while offset < chunk.code.len(){
         offset = disassemble_instruction(chunk, offset);
     }
+
+    println!("==END==");
 }
 
 fn disassemble_instruction(chunk: &Chunk, offset: usize) -> usize{ 
@@ -16,7 +18,8 @@ fn disassemble_instruction(chunk: &Chunk, offset: usize) -> usize{
 
     match instruction{
         Operation::Return => return simple_instruction("RETURN".to_string(), offset),
-        _ => println!("{}", "INVALID INSTRUCTION".to_string())
+        Operation::Constant => return constant_instruction("CONSTANT".to_string(), chunk, offset), 
+        _ => println!("INVALID INSTRUCTION {:?}", instruction)
     }
 
     offset + 1 
@@ -25,4 +28,16 @@ fn disassemble_instruction(chunk: &Chunk, offset: usize) -> usize{
 fn simple_instruction(name: String, offset: usize) -> usize{
     print!("{name}\n");
     offset + 1
+}
+
+fn constant_instruction(name: String, chunk: &Chunk, offset: usize) -> usize{
+    let constant = chunk.code[offset + 1];
+    print!("{} {:#04} ", name, constant);
+    print_value(chunk.constants[constant as usize]);
+    print!("\n");
+    offset + 2
+}
+
+fn print_value(value: Value){
+    print!("{}", value)
 }

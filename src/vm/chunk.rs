@@ -3,9 +3,9 @@
 use std::fmt::{self, write};
 use std::convert::From;
 
-type Value = f32;
+pub type Value = f32;
 
-#[repr(u8)]
+#[derive(Debug, Clone, Copy)]
 pub enum Operation{
     Return = 0,
     Constant = 1
@@ -19,7 +19,7 @@ pub struct Chunk{
     1 + 2; -> 3[But at runtime] Interpreter needs to store 1, 2
     sort of instructions that 'Produce a value'
     */
-    constants: Vec<Value>
+    pub constants: Vec<Value>
 }
 
 impl Chunk{
@@ -34,7 +34,12 @@ impl Chunk{
         self.code.push(op as u8);
     }
 
-    pub fn add_constant(&mut self, value: Value) -> i32{
+    //Used to add const index in the instructions
+    pub fn write_chunk_u8(&mut self, c: u8){
+        self.code.push(c);
+    }
+
+    pub fn add_constant(&mut self, value: Value) -> usize{
         self.constants.push(value);
         get_index(&self.constants, value)
     }
@@ -42,9 +47,9 @@ impl Chunk{
 }
 
 
-fn get_index<T: PartialEq>(vec: &Vec<T>, x: T) -> i32{
+fn get_index<T: PartialEq>(vec: &Vec<T>, x: T) -> usize{
     let index = vec.iter().position(|element| element == &x).unwrap();
-    index as i32
+    index
 }
 
 pub fn u8_to_operation(byte_code: u8) -> Operation{

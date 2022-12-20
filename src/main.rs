@@ -24,15 +24,25 @@ use crate::vm::debug::disassemble_chunk;
 fn main() {
 
   let mut chunk = vm::chunk::Chunk::init();
-  chunk.add_constant(1.2);
 
   let string = String::new();
 
   // chunk.write_chunk(vm::chunk::Operation::Constant);
 
+  let constant = chunk.add_constant(1.2);
   chunk.write_chunk(vm::chunk::Operation::Return);
-  disassemble_chunk(&chunk);
+  chunk.write_chunk(vm::chunk::Operation::Constant);
+  chunk.write_chunk_u8(constant as u8);
 
+  let con = chunk.add_constant(1.42);
+  chunk.write_chunk(vm::chunk::Operation::Constant);
+  chunk.write_chunk_u8(con as u8);
+
+  let con2 = chunk.add_constant(1.50);
+  chunk.write_chunk(vm::chunk::Operation::Constant);
+  chunk.write_chunk_u8(con2 as u8);
+  disassemble_chunk(&chunk);
+  println!("CONST POOL: {:?}", chunk.constants)
    
     // let args: Vec<String> = args().collect();
 
