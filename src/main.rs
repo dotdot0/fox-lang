@@ -10,7 +10,7 @@ mod interpreter;
 mod expr;
 mod astprinter;
 mod stmt;
-pub mod vm;
+mod vm;
 
 //use error::LoxError;
 //Imports

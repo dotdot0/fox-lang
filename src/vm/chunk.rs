@@ -19,14 +19,21 @@ pub struct Chunk{
     1 + 2; -> 3[But at runtime] Interpreter needs to store 1, 2
     sort of instructions that 'Produce a value'
     */
-    pub constants: Vec<Value>
+    pub constants: Vec<Value>,
+    /* 
+    Element at each index of lines is 
+    the line number of the instruction 
+    at the same index
+    */
+    pub lines: Vec<i32>
 }
 
 impl Chunk{
     pub fn init() -> Self{
         Self{
             code: vec![],
-            constants: vec![]
+            constants: vec![],
+            lines: vec![]
         }
     }
 
