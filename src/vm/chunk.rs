@@ -37,13 +37,15 @@ impl Chunk{
         }
     }
 
-    pub fn write_chunk(&mut self, op: Operation){
+    pub fn write_chunk(&mut self, op: Operation, line: i32){
         self.code.push(op as u8);
+        self.lines.push(line);
     }
 
     //Used to add const index in the instructions
-    pub fn write_chunk_u8(&mut self, c: u8){
+    pub fn write_chunk_u8(&mut self, c: u8, line: i32){
         self.code.push(c);
+        self.lines.push(line);
     }
 
     pub fn add_constant(&mut self, value: Value) -> usize{

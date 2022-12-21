@@ -8,6 +8,8 @@ pub fn disassemble_chunk(chunk: &Chunk){
     while offset < chunk.code.len(){
         offset = disassemble_instruction(chunk, offset);
     }
+    
+    println!("CONSTANT POOL: {:?}", chunk.constants);
 
     println!("==END==");
 }
