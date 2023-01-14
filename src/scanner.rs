@@ -23,6 +23,7 @@ impl Scanner{
         }
     }
 
+    //Scan Tokens
     pub fn scan_tokens(&mut self) -> Result<&Vec<Token>, String>{
         while !self.is_at_end(){
             self.start = self.current;
