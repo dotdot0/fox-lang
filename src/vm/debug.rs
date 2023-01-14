@@ -40,6 +40,6 @@ fn constant_instruction(name: String, chunk: &Chunk, offset: usize) -> usize{
     offset + 2
 }
 
-fn print_value(value: Value){
+pub fn print_value(value: Value){
     print!("{}", value)
 }

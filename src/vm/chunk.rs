@@ -8,7 +8,7 @@ pub type Value = f32;
 #[derive(Debug, Clone, Copy)]
 pub enum Operation{
     Return = 0,
-    Constant = 1
+    Constant
 }
 
 
