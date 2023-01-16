@@ -23,38 +23,38 @@ use crate::vm::debug::disassemble_chunk;
 
 fn main() {
 
-  let mut chunk = vm::chunk::Chunk::init();
+  // let mut chunk = vm::chunk::Chunk::init();
 
-  let string = String::new();
+  // let string = String::new();
 
   // chunk.write_chunk(vm::chunk::Operation::Constant);
 
-  let constant = chunk.add_constant(1.2);
-  chunk.write_chunk(vm::chunk::Operation::Return, 123);
-  chunk.write_chunk(vm::chunk::Operation::Constant, 124);
-  chunk.write_chunk_u8(constant as u8, 124);
+  // let constant = chunk.add_constant(1.2);
+  // chunk.write_chunk(vm::chunk::Operation::Return, 123);
+  // chunk.write_chunk(vm::chunk::Operation::Constant, 124);
+  // chunk.write_chunk_u8(constant as u8, 124);
 
-  let con = chunk.add_constant(1.42);
-  chunk.write_chunk(vm::chunk::Operation::Constant, 125);
-  chunk.write_chunk_u8(con as u8, 125);
+  // let con = chunk.add_constant(1.42);
+  // chunk.write_chunk(vm::chunk::Operation::Constant, 125);
+  // chunk.write_chunk_u8(con as u8, 125);
 
-  let con2 = chunk.add_constant(1.50);
-  chunk.write_chunk(vm::chunk::Operation::Constant, 126);
-  chunk.write_chunk_u8(con2 as u8, 126);
-  disassemble_chunk(&chunk);
+  // let con2 = chunk.add_constant(1.50);
+  // chunk.write_chunk(vm::chunk::Operation::Constant, 126);
+  // chunk.write_chunk_u8(con2 as u8, 126);
+  // disassemble_chunk(&chunk);
    
-    // let args: Vec<String> = args().collect();
+    let args: Vec<String> = args().collect();
 
-    // if args.len() > 2{
-    //   println!("Usage: rlox [script]");
-    //   std::process::exit(64)
-    // }
-    // else if args.len() == 2{
-    //   run_file(&args[1])
-    // }
-    // else{
-    //   run_prompt()
-    // }
+    if args.len() > 2{
+      println!("Usage: rlox [script]");
+      std::process::exit(64)
+    }
+    else if args.len() == 2{
+      run_file(&args[1])
+    }
+    else{
+      run_prompt()
+    }
 }
 
 fn run_file(file: &String){ 
