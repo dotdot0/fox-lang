@@ -45,4 +45,7 @@ impl Token {
     pub fn eof(line:usize) -> Token{
         Token { ttype: TokenType::EOF, lexeme: "".to_owned(), literal: None, line , column: 0}
     }
+    pub fn tok_to_str(&self) -> String{
+        return format!("ttype: {:?},lexeme: {:?},literal: {:?},line: {:?}", self.ttype, self.lexeme, self.literal, self.line);
+    }
 }  
