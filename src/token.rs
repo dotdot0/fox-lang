@@ -5,9 +5,13 @@ use crate::token_type::*;
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Object{
+    //Number
     Num(f32),
+    //String
     Str(String),
+    //Bool
     Bool(bool),
+    //NULL
     Nil
 }
 
