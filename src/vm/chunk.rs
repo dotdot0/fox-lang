@@ -1,8 +1,5 @@
 #![allow(unused)]
 
-use std::fmt::{self, write};
-use std::convert::From;
-
 pub type Value = f32;
 
 #[derive(Debug, Clone, Copy)]

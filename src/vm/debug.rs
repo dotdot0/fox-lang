@@ -16,11 +16,19 @@ pub fn disassemble_chunk(chunk: &Chunk){
 
 fn disassemble_instruction(chunk: &Chunk, offset: usize) -> usize{ 
     print!("{:#04} ", offset);
+
+    if offset > 0 && 
+    chunk.lines.get(offset).unwrap() == chunk.lines.get(offset - 1).unwrap(){
+        print!("   | ");
+    }
+    else{
+        print!("{:#04} ", chunk.lines.get(offset).unwrap());
+    }
     let instruction: Operation = u8_to_operation(chunk.code[offset]);
 
     match instruction{
-        Operation::Return => return simple_instruction("RETURN".to_string(), offset),
-        Operation::Constant => return constant_instruction("CONSTANT".to_string(), chunk, offset), 
+        Operation::Return => return simple_instruction("OP_RETURN".to_string(), offset),
+        Operation::Constant => return constant_instruction("OP_CONSTANT".to_string(), chunk, offset), 
         _ => println!("INVALID INSTRUCTION {:?}", instruction)
     }
 
