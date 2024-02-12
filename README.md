@@ -6,7 +6,7 @@
 - [x] Lexer/Scanner
 - [x] Basic REPL
 - [ ] Error Handling
-- [x] Parser(WIP)(A recursive descent parser)
+- [x] Parser(A recursive descent parser)
 - [ ] ByteCode Compiler
 - [ ] Virtual Machine
 
